@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Code2, UserPlus, Eye, EyeOff } from 'lucide-react'
+import { UserPlus, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Signup() {
@@ -33,14 +33,6 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-dark-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md fade-in">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center mb-4 pulse-ring">
-            <Code2 size={28} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">CodeTutor</h1>
-          <p className="text-slate-400 text-sm mt-1">Start learning today</p>
-        </div>
-
         <div className="bg-dark-800 rounded-2xl border border-slate-700 p-8 shadow-2xl">
           <h2 className="text-xl font-semibold text-white mb-6">Create your account</h2>
 
@@ -114,7 +106,10 @@ export default function Signup() {
 
           <p className="mt-6 text-center text-sm text-slate-400">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium">
+            <Link
+              to="/login"
+              className="inline-flex items-center rounded-md border border-primary-500/40 bg-primary-500/10 px-2.5 py-1 text-primary-300 hover:bg-primary-500/20 hover:text-primary-200 font-semibold transition-colors"
+            >
               Sign in
             </Link>
           </p>

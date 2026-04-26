@@ -122,7 +122,7 @@ router.get('/analytics', async (req, res) => {
     .sort((a, b) => b.sessions - a.sessions)
     .slice(0, 8)
 
-  const topUsers = [...userAgg.values()]
+  const allUsers = [...userAgg.values()]
     .map((u) => ({
       userId: u.user_id,
       fullName: u.full_name || null,
@@ -132,7 +132,8 @@ router.get('/analytics', async (req, res) => {
       avgScore: u.scoredSessions ? Math.round(u.totalScore / u.scoredSessions) : 0,
     }))
     .sort((a, b) => b.sessions - a.sessions)
-    .slice(0, 10)
+
+  const topUsers = allUsers.slice(0, 10)
 
   const recentSessions = sessionsList
     .slice(0, 12)
@@ -161,6 +162,7 @@ router.get('/analytics', async (req, res) => {
     },
     topTopics,
     topUsers,
+    allUsers,
     recentSessions,
     isAdmin: true,
   })

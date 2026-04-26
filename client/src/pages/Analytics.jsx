@@ -107,10 +107,10 @@ export default function Analytics() {
               />
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-4">
+            <div className="grid lg:grid-cols-2 gap-4 mb-4">
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <h2 className="text-white font-semibold mb-3">Top Users</h2>
-                <div className="space-y-2 max-h-96 overflow-auto pr-1">
+                <div className="space-y-2 max-h-80 overflow-auto pr-1">
                   {(analytics?.topUsers || []).map((user) => (
                     <div key={user.userId} className="bg-dark-900 rounded-lg border border-slate-700 px-3 py-2">
                       <p className="text-slate-100 text-sm font-medium">{user.fullName || user.userId}</p>
@@ -125,6 +125,25 @@ export default function Analytics() {
                 </div>
               </section>
 
+              <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
+                <h2 className="text-white font-semibold mb-3">All Users</h2>
+                <div className="space-y-2 max-h-80 overflow-auto pr-1">
+                  {(analytics?.allUsers || []).map((user) => (
+                    <div key={user.userId} className="bg-dark-900 rounded-lg border border-slate-700 px-3 py-2">
+                      <p className="text-slate-100 text-sm font-medium">{user.fullName || user.userId}</p>
+                      <p className="text-slate-400 text-xs mt-1">
+                        {user.sessions} sessions · {user.totalQuestions} questions · {user.avgScore}% avg
+                      </p>
+                    </div>
+                  ))}
+                  {(analytics?.allUsers || []).length === 0 && (
+                    <p className="text-slate-500 text-sm">No user session data yet.</p>
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-4">
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <h2 className="text-white font-semibold mb-3">Top Topics</h2>
                 <div className="space-y-2 max-h-96 overflow-auto pr-1">

@@ -43,6 +43,5 @@ function normalize(value) {
 
 function formatExpectedAnswer(value) {
   const raw = String(value || 'N/A').trim()
-  if (raw.length <= 80) return raw
-  return `${raw.slice(0, 77)}...`
+  return raw
 }

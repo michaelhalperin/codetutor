@@ -94,7 +94,7 @@ export default function Login() {
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="text-primary-400 hover:text-primary-300 font-medium"
+              className="inline-flex items-center rounded-md border border-primary-500/40 bg-primary-500/10 px-2.5 py-1 text-primary-300 hover:bg-primary-500/20 hover:text-primary-200 font-semibold transition-colors"
             >
               Sign up free
             </Link>

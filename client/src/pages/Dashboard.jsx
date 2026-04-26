@@ -155,9 +155,12 @@ export default function Dashboard() {
               {recentSessions.length > 0 && (
                 <button
                   onClick={() => navigate('/sessions')}
-                  className="text-primary-400 hover:text-primary-300 text-sm font-medium"
+                  className="group text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors"
                 >
                   View all
+                  <span className="ml-1 inline-block opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                    →
+                  </span>
                 </button>
               )}
             </div>
