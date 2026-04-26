@@ -110,7 +110,7 @@ export default function Dashboard() {
   }
 
   const { overview = {}, recentSessions = [], topicStats = [] } = data || {}
-  const topicsPerPage = 6
+  const topicsPerPage = 4
   const totalTopicsPages = Math.max(1, Math.ceil(topicStats.length / topicsPerPage))
   const paginatedTopics = topicStats.slice(
     (topicsPage - 1) * topicsPerPage,
@@ -184,7 +184,7 @@ export default function Dashboard() {
           </div>
 
           {/* Topic Performance */}
-          <div>
+          <div className="flex flex-col h-full">
             <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
               <BarChart2 size={17} className="text-slate-400" /> Topics Practiced
             </h2>
@@ -193,7 +193,7 @@ export default function Dashboard() {
                 <p className="text-slate-400">No topic data yet.</p>
               </div>
             ) : (
-              <>
+              <div className="flex flex-col flex-1">
                 <div className="space-y-2">
                   {paginatedTopics.map((t) => (
                     <div key={t.id} className="bg-dark-800 rounded-xl border border-slate-700 px-4 py-3">
@@ -213,7 +213,7 @@ export default function Dashboard() {
                   ))}
                 </div>
                 {totalTopicsPages > 1 && (
-                  <div className="mt-3 flex items-center justify-between">
+                  <div className="mt-auto pt-3 flex items-center justify-between">
                     <button
                       onClick={() => setTopicsPage((p) => Math.max(1, p - 1))}
                       disabled={topicsPage === 1}
@@ -233,7 +233,7 @@ export default function Dashboard() {
                     </button>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
