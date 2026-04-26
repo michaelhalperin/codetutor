@@ -21,6 +21,9 @@ const envAllowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || 
   .map((origin) => origin.trim())
   .filter(Boolean)
 const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])]
+const allowedOriginPatterns = [
+  /^https:\/\/.*\.vercel\.app$/,
+]
 
 // ---- Middleware ----
 app.use(cors({
@@ -28,6 +31,9 @@ app.use(cors({
     // Allow non-browser requests (curl/postman/server-to-server).
     if (!origin) return callback(null, true)
     if (allowedOrigins.includes(origin)) return callback(null, true)
+    if (allowedOriginPatterns.some((pattern) => pattern.test(origin))) {
+      return callback(null, true)
+    }
     return callback(new Error(`CORS blocked for origin: ${origin}`))
   },
   credentials: true,
