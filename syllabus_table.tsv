@@ -1,0 +1,20 @@
+Title (נושא)	Content (תוכן)
+
+מבוא למחשבים	בסיסים,המרה בין בסיסים  (Binary / Decimal / Hex)
+מבנה המחשב	זיכרון, CPU, IO  המחשות task manager
+OS	processes, memory, תפקידי מערכת ההפעלה:         •        ניהול תהליכים         •        ניהול זיכרון          •        ניהול קבצים         •        ניהול התקני קלט/פלט דרייברים          •        ניהול משתמשים והרשאות דוגמאות: Windows, Linux, macOS, Android  file system bash
+תקשורת	איך עובד האינטרנט, מודל שכבות, פרוטקולים
+Python basic	Intro | Variables | Conditions | Loops | Functions basic | PEP8 | List
+Git	Version Control | git init | git clone | git add | git commit | git status | git log | git diff | git branch | git checkout/switch | git merge | git rebase | git reset/revert | GitHub | Pull Request | Conflict Resolution | .gitignore | Team Workflow
+clean code	Correct Naming | Small Functions | Single Responsibility | DRY | KISS | Separation of Concerns | Code Readability | Consistency | Comments | Refactoring | Folder Structure | Modular Code |  Easy to Maintain
+debugging	חשיבה וניתוח (Bug, Reproduce, Expected vs Actual, Root Cause, Isolation, Hypothesis) | כלים (Breakpoint, Step Into/Over, Debugger, Logging, Stack Trace) | סוגי שגיאות (Syntax Error, Runtime Error, Logical Error) | תהליך עבודה (Reproduce, Isolate, Fix, Verify)
+Python - Exceptions	raise,try,except,finally
+Python - Data Structures	Mutable vs Immutable | list/tuple/set/dict | Ordered vs Unordered | Slicing & `slice()` | `is` vs `==` | `id()` | List Operations | Dict Operations | Add/Delete/Search/Sort/Copy/Iterate | String Manipulation | Filtering | Intersections | Unique Values | Min/Max | deep copy vs shallow copy
+Python - Scopes and Modules	LEGB Scopes | Mutable/Immutable | Default Arguments | `global` | `if __name__ == "__main__"` | Modules & Packages | `import / from / as` | `__init__.py` | `__all__` | `globals()/locals()/vars()` | Avoid `import *` | Circular Imports | Comprehensions | `reload()`
+Python - Functions	Pure Functions | Higher-Order Functions | Nested Functions | Enclosing | Nonlocal | `*args & **kwargs` | Lambda | Decorators
+Python - files	File Modes | open/close | with statement | read/readline/readlines | write/writelines | seek/teil | Text  | JSON Files
+logs	Logging | Why Logs | info | warn | error | debug | Best Practices | Log Format | Save to File | Logger Libraries
+Python - Iterators and Generators	Iterators | __iter__/__next__ | StopIteration | iter() | next() | Generators | yield | yield from | Generator Expressions | Lazy Evaluation | Infinite Sequences | itertools | Chaining Generators | Memory Efficiency | send() | throw() | close()
+Python - Classes and Inheritance	OOP Basics | `class/object` | Function vs Method | `self` | `__init__` | Instance vs Class Attributes | Objects without `__init__` | Dynamic Attributes | Inheritance | Polymorphism | Override | `isinstance/issubclass` | `type()`
+DB - SQL	select *, project, order by, filter and operators, row func, col func
+HTTP and Servers	HTTP, FastAPI, HTTPS, DNS, client, server, curl, DB(MongoDB, PostgreSQL) venv

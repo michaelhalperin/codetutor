@@ -1,0 +1,1809 @@
+{
+  "מבוא למחשבים": [
+    {
+      "type": "multiple_choice",
+      "question": "What is binary 1010 in decimal?",
+      "options": [
+        "A. 8",
+        "B. 9",
+        "C. 10",
+        "D. 12"
+      ],
+      "correct_answer": "C",
+      "explanation": "1010 in binary is 8 + 2, which equals 10.",
+      "tip": "Convert by summing powers of 2 for each 1 bit."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: Decimal 255 in hexadecimal is ___.",
+      "correct_answer": "FF",
+      "explanation": "255 equals FF in base-16.",
+      "tip": "Each hex digit represents 4 binary bits."
+    },
+    {
+      "type": "true_false",
+      "question": "Hexadecimal uses 16 symbols: 0-9 and A-F.",
+      "correct_answer": "true",
+      "explanation": "Hex is base-16 and includes digits 0-9 plus letters A-F.",
+      "tip": "Remember: A=10, B=11, ..., F=15."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which binary value equals decimal 15?",
+      "options": [
+        "A. 1111",
+        "B. 1011",
+        "C. 1001",
+        "D. 1101"
+      ],
+      "correct_answer": "A",
+      "explanation": "1111 is 8 + 4 + 2 + 1 = 15.",
+      "tip": "For all 1s in four bits, add every place value."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: Binary 10000 in decimal is ___.",
+      "correct_answer": "16",
+      "explanation": "10000 in binary is 2^4, which equals 16.",
+      "tip": "A single 1 followed by n zeros equals 2^n."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What is hexadecimal A in decimal?",
+      "options": [
+        "A. 8",
+        "B. 9",
+        "C. 10",
+        "D. 11"
+      ],
+      "correct_answer": "C",
+      "explanation": "In hexadecimal, A represents decimal 10.",
+      "tip": "Hex letters continue after 9: A=10, B=11, etc."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: Decimal 31 in binary is ___.",
+      "correct_answer": "11111",
+      "explanation": "31 equals 16 + 8 + 4 + 2 + 1, so the binary form is 11111.",
+      "tip": "Use powers of two to build the decimal number."
+    },
+    {
+      "type": "true_false",
+      "question": "Each hexadecimal digit maps exactly to 4 binary bits.",
+      "correct_answer": "true",
+      "explanation": "One hex digit spans values 0-15, which are represented by 4 bits.",
+      "tip": "4 bits can represent 16 values."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which decimal number is represented by binary 1101?",
+      "options": [
+        "A. 11",
+        "B. 12",
+        "C. 13",
+        "D. 14"
+      ],
+      "correct_answer": "C",
+      "explanation": "1101 is 8 + 4 + 1, which equals 13.",
+      "tip": "Add place values where the bit is 1."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: Decimal 64 in binary is ___.",
+      "correct_answer": "1000000",
+      "explanation": "64 is 2^6, so binary is 1 followed by 6 zeros.",
+      "tip": "Powers of two are easy in binary."
+    }
+  ],
+  "מבנה המחשב": [
+    {
+      "type": "multiple_choice",
+      "question": "Which component performs arithmetic and logic operations?",
+      "options": [
+        "A. RAM",
+        "B. ALU",
+        "C. SSD",
+        "D. GPU fan"
+      ],
+      "correct_answer": "B",
+      "explanation": "The ALU inside the CPU handles arithmetic and logic operations.",
+      "tip": "ALU = Arithmetic Logic Unit."
+    },
+    {
+      "type": "true_false",
+      "question": "RAM is volatile memory.",
+      "correct_answer": "true",
+      "explanation": "RAM loses its contents when power is turned off.",
+      "tip": "Volatile means temporary while powered."
+    },
+    {
+      "type": "open_ended",
+      "question": "Explain the difference between CPU, memory, and I/O in one short paragraph.",
+      "correct_answer": "CPU executes instructions, memory stores data/instructions temporarily, and I/O allows communication with external devices like keyboard, disk, and network.",
+      "explanation": "Good answers clearly separate compute, storage, and communication roles.",
+      "tip": "Use the flow: input -> process -> store/output."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "In Task Manager, consistently high CPU usage by one app most likely indicates what?",
+      "options": [
+        "A. Disk fragmentation only",
+        "B. The process is consuming many compute cycles",
+        "C. Low monitor refresh rate",
+        "D. Keyboard driver mismatch"
+      ],
+      "correct_answer": "B",
+      "explanation": "High CPU percentage means that process is actively using processor time.",
+      "tip": "Sort by CPU to identify top-consuming processes quickly."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which Task Manager tab is most useful to inspect startup impact of apps on boot time (Windows)?",
+      "options": [
+        "A. Startup",
+        "B. Details",
+        "C. Users",
+        "D. Services"
+      ],
+      "correct_answer": "A",
+      "explanation": "The Startup tab shows enabled startup apps and their impact.",
+      "tip": "Disabling unnecessary startup apps can improve boot performance."
+    },
+    {
+      "type": "open_ended",
+      "question": "How do CPU, RAM, and Disk activity together help diagnose a slow computer?",
+      "correct_answer": "If CPU is high, compute is the bottleneck; if RAM is full, the system may swap to disk; if disk usage is saturated, storage I/O is the bottleneck. Looking at all three reveals the real limiting resource.",
+      "explanation": "Good answers correlate multiple resource metrics instead of checking one in isolation.",
+      "tip": "A common pattern is high memory pressure causing high disk usage from paging."
+    }
+  ],
+  "OS": [
+    {
+      "type": "multiple_choice",
+      "question": "Which OS responsibility decides which process runs next?",
+      "options": [
+        "A. File compression",
+        "B. CPU scheduling",
+        "C. Screen brightness",
+        "D. Browser cache"
+      ],
+      "correct_answer": "B",
+      "explanation": "CPU scheduling is part of process management in an operating system.",
+      "tip": "Think \"scheduler\" when you hear \"what runs next\"."
+    },
+    {
+      "type": "fill_blank",
+      "question": "A program currently being executed is called a ___.",
+      "correct_answer": "process",
+      "explanation": "A running instance of a program is a process.",
+      "tip": "Program on disk, process in memory."
+    },
+    {
+      "type": "open_ended",
+      "question": "Name 3 core OS roles and briefly describe each.",
+      "correct_answer": "Examples: process management (scheduling/running tasks), memory management (allocation/protection), file/device management (files, drivers, permissions).",
+      "explanation": "Any correct 3 major roles with short explanation are valid.",
+      "tip": "Use: processes, memory, files/devices, users/permissions."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which OS component allows programs to interact with hardware devices?",
+      "options": [
+        "A. Compiler",
+        "B. Driver",
+        "C. Hyperlink",
+        "D. Shell alias"
+      ],
+      "correct_answer": "B",
+      "explanation": "Device drivers let the OS communicate with specific hardware.",
+      "tip": "Driver = software bridge to hardware."
+    },
+    {
+      "type": "true_false",
+      "question": "Linux, Windows, and macOS are all operating systems.",
+      "correct_answer": "true",
+      "explanation": "These are mainstream desktop/server operating systems.",
+      "tip": "Android is also an OS (mobile-focused)."
+    },
+    {
+      "type": "fill_blank",
+      "question": "A file system organizes data on storage into files and ___.",
+      "correct_answer": "directories",
+      "explanation": "Directories (folders) structure files hierarchically.",
+      "tip": "Path navigation depends on directory structure."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which command is commonly used in bash to list files?",
+      "options": [
+        "A. ls",
+        "B. rm",
+        "C. pwdx",
+        "D. catz"
+      ],
+      "correct_answer": "A",
+      "explanation": "ls lists files and directories in a location.",
+      "tip": "Try ls -la for more details."
+    },
+    {
+      "type": "open_ended",
+      "question": "Why are user permissions important in an OS?",
+      "correct_answer": "Permissions enforce security by controlling who can read, write, or execute files and system resources, reducing accidental or malicious damage.",
+      "explanation": "Strong answers mention access control and security boundaries.",
+      "tip": "Think principle of least privilege."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which operating system is primarily used on most modern smartphones?",
+      "options": [
+        "A. Android",
+        "B. Windows Server",
+        "C. FreeBSD",
+        "D. Solaris"
+      ],
+      "correct_answer": "A",
+      "explanation": "Android is the dominant mobile OS and is built on top of the Linux kernel.",
+      "tip": "Match OS type to platform: desktop/server/mobile."
+    }
+  ],
+  "תקשורת": [
+    {
+      "type": "multiple_choice",
+      "question": "Which protocol is commonly used to resolve domain names to IP addresses?",
+      "options": [
+        "A. HTTP",
+        "B. DNS",
+        "C. FTP",
+        "D. SSH"
+      ],
+      "correct_answer": "B",
+      "explanation": "DNS maps hostnames to IP addresses.",
+      "tip": "Think: website name lookup."
+    },
+    {
+      "type": "true_false",
+      "question": "HTTP is an application-layer protocol.",
+      "correct_answer": "true",
+      "explanation": "HTTP operates at the application layer.",
+      "tip": "It is used by browsers and servers to exchange web resources."
+    },
+    {
+      "type": "open_ended",
+      "question": "Briefly explain why network models use layers.",
+      "correct_answer": "Layers separate responsibilities, simplify design, improve interoperability, and allow changes in one layer without breaking others.",
+      "explanation": "Layering enables modular networking and easier troubleshooting.",
+      "tip": "Mention abstraction and separation of concerns."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "In layered networking, where does routing between networks mainly happen?",
+      "options": [
+        "A. Physical layer",
+        "B. Network layer",
+        "C. Presentation layer",
+        "D. Application layer"
+      ],
+      "correct_answer": "B",
+      "explanation": "Routing decisions are made at the network layer (IP).",
+      "tip": "Routers forward packets using IP addressing."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which protocol is connection-oriented and provides reliable delivery?",
+      "options": [
+        "A. UDP",
+        "B. TCP",
+        "C. ARP",
+        "D. ICMP"
+      ],
+      "correct_answer": "B",
+      "explanation": "TCP establishes a connection and supports retransmission/ordering.",
+      "tip": "UDP is lighter but not reliability-guaranteed."
+    },
+    {
+      "type": "fill_blank",
+      "question": "The process of converting a domain name to IP is called ___.",
+      "correct_answer": "name resolution",
+      "explanation": "DNS performs domain-to-IP name resolution.",
+      "tip": "Browsers usually query DNS before opening a web connection."
+    },
+    {
+      "type": "open_ended",
+      "question": "Explain the difference between HTTP and TCP in one or two sentences.",
+      "correct_answer": "HTTP is an application-layer protocol that defines request/response semantics, while TCP is a transport-layer protocol that provides reliable byte-stream delivery.",
+      "explanation": "Correct answers distinguish protocol purpose and layer.",
+      "tip": "Ask: what is sent (HTTP) vs how it is delivered (TCP)."
+    }
+  ],
+  "Python basic": [
+    {
+      "type": "multiple_choice",
+      "question": "Which keyword defines a function in Python?",
+      "options": [
+        "A. func",
+        "B. define",
+        "C. def",
+        "D. fn"
+      ],
+      "correct_answer": "C",
+      "explanation": "Python uses def to define functions.",
+      "tip": "Syntax starts with def name(...):"
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: for i ___ range(3):",
+      "correct_answer": "in",
+      "explanation": "Python for-loops use the keyword in.",
+      "tip": "Read it as \"for i in ...\"."
+    },
+    {
+      "type": "true_false",
+      "question": "PEP8 is a style guide for Python code.",
+      "correct_answer": "true",
+      "explanation": "PEP8 defines common coding style conventions for Python.",
+      "tip": "Style consistency improves readability."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which line correctly assigns integer 5 to variable x?",
+      "options": [
+        "A. int x = 5",
+        "B. x := 5",
+        "C. x = 5",
+        "D. set x 5"
+      ],
+      "correct_answer": "C",
+      "explanation": "Python variable assignment uses =.",
+      "tip": "No type declaration is required in basic assignment."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: if score ___ 90: print('A')",
+      "correct_answer": ">=",
+      "explanation": ">= checks if score is at least 90.",
+      "tip": "Conditions evaluate to True or False."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code that loops over list nums and prints only even numbers.",
+      "correct_answer": "for n in nums:\n    if n % 2 == 0:\n        print(n)",
+      "explanation": "Modulo checks if a number is even.",
+      "tip": "n % 2 equals 0 for even integers.",
+      "code_language": "python"
+    },
+    {
+      "type": "true_false",
+      "question": "Python lists can hold mixed data types.",
+      "correct_answer": "true",
+      "explanation": "A list can contain integers, strings, objects, and more.",
+      "tip": "Mixed-type lists are allowed, though not always ideal."
+    }
+  ],
+  "Git": [
+    {
+      "type": "multiple_choice",
+      "question": "Which command stages changes for commit?",
+      "options": [
+        "A. git status",
+        "B. git add",
+        "C. git branch",
+        "D. git log"
+      ],
+      "correct_answer": "B",
+      "explanation": "git add moves changes to the staging area.",
+      "tip": "Flow: edit -> add -> commit -> push."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Create a new repository in current folder: git ___.",
+      "correct_answer": "init",
+      "explanation": "git init initializes a new repository.",
+      "tip": "Use once at project start."
+    },
+    {
+      "type": "open_ended",
+      "question": "When would you use rebase instead of merge?",
+      "correct_answer": "Rebase is useful to keep a linear history by replaying commits on a new base, often on local feature branches before sharing.",
+      "explanation": "Good answers compare linear history vs merge commits.",
+      "tip": "Prefer rebasing local commits; avoid rewriting shared public history."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Clone a remote repository: git ___ <repo-url>",
+      "correct_answer": "clone",
+      "explanation": "git clone creates a local copy of a remote repository.",
+      "tip": "Cloning also sets up origin remote."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which command shows commit history?",
+      "options": [
+        "A. git log",
+        "B. git diff",
+        "C. git fetch",
+        "D. git show-branch"
+      ],
+      "correct_answer": "A",
+      "explanation": "git log displays commit history.",
+      "tip": "Use git log --oneline for compact output."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which command compares working directory changes against the index/HEAD?",
+      "options": [
+        "A. git status",
+        "B. git diff",
+        "C. git commit",
+        "D. git merge"
+      ],
+      "correct_answer": "B",
+      "explanation": "git diff is used to inspect line-by-line differences.",
+      "tip": "git diff --staged shows staged changes."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Create and switch to a new branch in one command: git switch -c ___.",
+      "correct_answer": "feature-branch",
+      "explanation": "git switch -c <name> creates and checks out a branch.",
+      "tip": "Older equivalent pattern: git checkout -b <name>."
+    },
+    {
+      "type": "true_false",
+      "question": "A pull request is commonly used for team code review before merging.",
+      "correct_answer": "true",
+      "explanation": "PRs let teammates review and discuss changes before integration.",
+      "tip": "PRs often run CI checks automatically."
+    },
+    {
+      "type": "open_ended",
+      "question": "What is the purpose of .gitignore?",
+      "correct_answer": ".gitignore specifies files and patterns Git should not track, such as build artifacts, local env files, and temporary files.",
+      "explanation": "Good answers mention keeping repo clean and avoiding sensitive/unnecessary files.",
+      "tip": "Typical examples: node_modules, .env, dist."
+    },
+    {
+      "type": "open_ended",
+      "question": "How would you resolve a merge conflict safely?",
+      "correct_answer": "Inspect conflicted files, choose or combine correct changes, remove conflict markers, run tests, then commit the resolution.",
+      "explanation": "Strong answers include verification before final commit.",
+      "tip": "Conflict markers look like <<<<<<<, =======, >>>>>>>."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which command shows tracked and untracked file state in your working tree?",
+      "options": [
+        "A. git status",
+        "B. git stash",
+        "C. git blame",
+        "D. git tag"
+      ],
+      "correct_answer": "A",
+      "explanation": "git status summarizes branch, staged, unstaged, and untracked changes.",
+      "tip": "Run it frequently to avoid surprises before committing."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What is the main difference between git reset and git revert for undoing commits?",
+      "options": [
+        "A. Both always create new commits",
+        "B. reset moves branch pointers/history; revert creates a new commit that undoes changes",
+        "C. revert deletes files permanently; reset never does",
+        "D. There is no meaningful difference"
+      ],
+      "correct_answer": "B",
+      "explanation": "reset rewrites where HEAD points, while revert preserves history with an inverse commit.",
+      "tip": "Prefer revert on shared branches to avoid rewriting public history."
+    },
+    {
+      "type": "open_ended",
+      "question": "Describe a safe team workflow from opening a feature branch to merging into main.",
+      "correct_answer": "Create a feature branch, commit focused changes with clear messages, push branch, open PR, request review, run CI/tests, resolve feedback/conflicts, and merge after approvals.",
+      "explanation": "Strong answers include review, CI verification, and conflict handling before merge.",
+      "tip": "Small PRs are easier to review and safer to merge."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which command integrates changes from one branch into your current branch?",
+      "options": [
+        "A. git merge",
+        "B. git stash",
+        "C. git reset",
+        "D. git blame"
+      ],
+      "correct_answer": "A",
+      "explanation": "git merge combines histories by integrating commits from another branch into the checked-out branch.",
+      "tip": "Merge usually creates a merge commit unless fast-forward is possible."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Historically, what was `git checkout` commonly used for?",
+      "options": [
+        "A. Only deleting branches",
+        "B. Switching branches and restoring files",
+        "C. Pushing to remote",
+        "D. Creating pull requests"
+      ],
+      "correct_answer": "B",
+      "explanation": "Before `git switch` and `git restore`, `git checkout` commonly handled branch switching and file restore operations.",
+      "tip": "Modern Git splits responsibilities into clearer commands."
+    }
+  ],
+  "clean code": [
+    {
+      "type": "multiple_choice",
+      "question": "Which principle suggests each function should do one thing well?",
+      "options": [
+        "A. DRY",
+        "B. KISS",
+        "C. Single Responsibility",
+        "D. YAGNI"
+      ],
+      "correct_answer": "C",
+      "explanation": "Single Responsibility encourages focused units with one reason to change.",
+      "tip": "If a function name needs \"and\", it may do too much."
+    },
+    {
+      "type": "true_false",
+      "question": "DRY means duplicating code is preferred for speed.",
+      "correct_answer": "false",
+      "explanation": "DRY means Don't Repeat Yourself; avoid duplicated logic.",
+      "tip": "Extract shared logic to reusable functions/modules."
+    },
+    {
+      "type": "open_ended",
+      "question": "Give two reasons why consistent naming matters.",
+      "correct_answer": "Consistent naming improves readability, reduces cognitive load, and helps teams understand and maintain code faster.",
+      "explanation": "Strong answers mention readability, collaboration, and maintainability.",
+      "tip": "Pick one naming convention and apply it everywhere."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which principle emphasizes keeping solutions as simple as possible?",
+      "options": [
+        "A. DRY",
+        "B. KISS",
+        "C. SOLID",
+        "D. FIFO"
+      ],
+      "correct_answer": "B",
+      "explanation": "KISS means Keep It Simple, Stupid.",
+      "tip": "Prefer simple designs unless complexity is justified."
+    },
+    {
+      "type": "true_false",
+      "question": "Useful comments should explain intent when code alone is not obvious.",
+      "correct_answer": "true",
+      "explanation": "Good comments capture why, assumptions, and tricky decisions.",
+      "tip": "Avoid comments that restate obvious code."
+    },
+    {
+      "type": "open_ended",
+      "question": "Why does separation of concerns improve maintainability?",
+      "correct_answer": "When responsibilities are separated, changes in one area are less likely to break others, making code easier to test, evolve, and understand.",
+      "explanation": "Strong answers mention coupling reduction and clearer boundaries.",
+      "tip": "Split UI, business logic, and data access concerns."
+    },
+    {
+      "type": "open_ended",
+      "question": "What is refactoring and when should you do it?",
+      "correct_answer": "Refactoring is improving internal code structure without changing behavior, often done when code is hard to read, duplicated, or risky to modify.",
+      "explanation": "Correct answers emphasize behavior-preserving improvements.",
+      "tip": "Refactor in small steps with tests."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which folder structure choice best supports maintainability in growing projects?",
+      "options": [
+        "A. Put every file in one folder for simplicity",
+        "B. Organize by feature/domain with clear boundaries",
+        "C. Separate files randomly by creation date",
+        "D. Keep all logic in index files only"
+      ],
+      "correct_answer": "B",
+      "explanation": "Feature/domain-based organization improves discoverability and ownership boundaries.",
+      "tip": "Use consistent naming and predictable locations for related code."
+    },
+    {
+      "type": "true_false",
+      "question": "Modular code usually makes testing and refactoring easier.",
+      "correct_answer": "true",
+      "explanation": "Smaller independent modules reduce coupling and simplify isolated testing.",
+      "tip": "Design modules with clear inputs/outputs and minimal side effects."
+    },
+    {
+      "type": "open_ended",
+      "question": "Give one sign a function should be split into smaller modules.",
+      "correct_answer": "If a function has multiple responsibilities, many branches, or depends on unrelated concerns, it should be split for clarity and maintainability.",
+      "explanation": "Strong answers mention complexity, mixed concerns, or difficult testing as triggers.",
+      "tip": "Long functions that require heavy comments are often refactor candidates."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which practice most directly improves code readability?",
+      "options": [
+        "A. Using single-letter variable names everywhere",
+        "B. Writing meaningful names and keeping functions focused",
+        "C. Avoiding whitespace to reduce file size",
+        "D. Nesting logic deeply in one function"
+      ],
+      "correct_answer": "B",
+      "explanation": "Readable code relies on descriptive naming and manageable units of logic.",
+      "tip": "Optimize for human readers first."
+    },
+    {
+      "type": "true_false",
+      "question": "Using a consistent naming and formatting style across a codebase helps teams move faster.",
+      "correct_answer": "true",
+      "explanation": "Consistency lowers cognitive load and makes files easier to navigate and review.",
+      "tip": "Project-level conventions reduce friction in collaboration."
+    }
+  ],
+  "debugging": [
+    {
+      "type": "multiple_choice",
+      "question": "What should you do first in a debugging workflow?",
+      "options": [
+        "A. Rewrite the whole feature",
+        "B. Reproduce the bug",
+        "C. Delete caches",
+        "D. Change random lines"
+      ],
+      "correct_answer": "B",
+      "explanation": "You must reproduce the bug reliably before fixing.",
+      "tip": "No reproducible bug = no reliable fix."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which tool lets you inspect variables step-by-step?",
+      "options": [
+        "A. Linter",
+        "B. Debugger",
+        "C. Formatter",
+        "D. Bundler"
+      ],
+      "correct_answer": "B",
+      "explanation": "A debugger with breakpoints allows step execution and variable inspection.",
+      "tip": "Use Step Over for flow and Step Into for internals."
+    },
+    {
+      "type": "true_false",
+      "question": "A syntax error is detected before runtime execution begins.",
+      "correct_answer": "true",
+      "explanation": "Syntax errors occur when code structure is invalid and cannot be parsed.",
+      "tip": "Runtime errors happen during execution; syntax errors before it."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which phrase best describes \"expected vs actual\" in debugging?",
+      "options": [
+        "A. Comparing system load to CPU speed",
+        "B. Comparing intended behavior to observed behavior",
+        "C. Comparing two code formatters",
+        "D. Comparing database engines"
+      ],
+      "correct_answer": "B",
+      "explanation": "Clarifying expected vs actual behavior narrows debugging scope.",
+      "tip": "Write both explicitly before changing code."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "A stack trace is most useful for understanding:",
+      "options": [
+        "A. CSS styles",
+        "B. Call path to an error",
+        "C. Git commit history",
+        "D. Network bandwidth"
+      ],
+      "correct_answer": "B",
+      "explanation": "A stack trace shows the function call chain leading to failure.",
+      "tip": "Read from top-level error and relevant frames."
+    },
+    {
+      "type": "open_ended",
+      "question": "What is a root cause in debugging?",
+      "correct_answer": "The root cause is the underlying reason a bug occurs, not just a symptom. Fixing it should prevent the issue from recurring in similar cases.",
+      "explanation": "Strong answers distinguish symptom fixes from true cause resolution.",
+      "tip": "Ask repeatedly: why did this happen?"
+    },
+    {
+      "type": "open_ended",
+      "question": "Why is verification required after applying a bug fix?",
+      "correct_answer": "Verification confirms the original bug is fixed and checks that no new regressions were introduced.",
+      "explanation": "A fix is incomplete without validation.",
+      "tip": "Retest original scenario plus nearby edge cases."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What does \"isolation\" mean in debugging?",
+      "options": [
+        "A. Hiding stack traces",
+        "B. Narrowing the failing area to the smallest reproducible part",
+        "C. Restarting computer repeatedly",
+        "D. Ignoring logs to avoid noise"
+      ],
+      "correct_answer": "B",
+      "explanation": "Isolation reduces variables so you can pinpoint where the bug is introduced.",
+      "tip": "Disable unrelated components and test one boundary at a time."
+    },
+    {
+      "type": "open_ended",
+      "question": "How does forming a hypothesis improve debugging speed?",
+      "correct_answer": "A hypothesis creates a testable explanation, so each experiment confirms or rejects a specific cause instead of random guessing.",
+      "explanation": "Strong answers mention evidence-based iteration and faster narrowing of root cause.",
+      "tip": "Write: hypothesis, test, observed result, next step."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "After isolating a suspected module, what is the best next step?",
+      "options": [
+        "A. Ship a hotfix immediately",
+        "B. Create a minimal test that reproduces the issue in that module",
+        "C. Refactor the whole codebase",
+        "D. Disable error reporting"
+      ],
+      "correct_answer": "B",
+      "explanation": "A minimal reproducible test validates the scope and protects against regression after fixing.",
+      "tip": "Keep reproduction tests small and deterministic."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which option best describes a logical error?",
+      "options": [
+        "A. Code fails to parse due to invalid syntax",
+        "B. Program runs but produces wrong output",
+        "C. Program crashes due to missing package",
+        "D. Terminal command has typo"
+      ],
+      "correct_answer": "B",
+      "explanation": "Logical errors are behavior bugs: the code executes but the result is incorrect.",
+      "tip": "Compare expected vs actual outcomes to catch logic flaws."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "How does structured logging help during debugging?",
+      "options": [
+        "A. It hides all runtime details",
+        "B. It makes issues reproducible by providing timestamped context",
+        "C. It replaces tests completely",
+        "D. It prevents runtime errors automatically"
+      ],
+      "correct_answer": "B",
+      "explanation": "Structured logs preserve context and sequence, which helps trace failures and verify hypotheses.",
+      "tip": "Include identifiers (request id, user id) for faster correlation."
+    }
+  ],
+  "Python - Exceptions": [
+    {
+      "type": "fill_blank",
+      "question": "Complete: try: ... except ___ as e:",
+      "correct_answer": "Exception",
+      "explanation": "A common broad handler is except Exception as e.",
+      "tip": "Prefer specific exception types when possible."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which block always runs whether an exception happened or not?",
+      "options": [
+        "A. except",
+        "B. raise",
+        "C. finally",
+        "D. pass"
+      ],
+      "correct_answer": "C",
+      "explanation": "finally always executes for cleanup.",
+      "tip": "Use finally for closing files/connections."
+    },
+    {
+      "type": "coding",
+      "question": "Write a function safe_divide(a, b) that returns None when division by zero occurs.",
+      "correct_answer": "def safe_divide(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return None",
+      "explanation": "Catch ZeroDivisionError and return fallback value.",
+      "tip": "Handle only expected exceptions, avoid bare except.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which keyword is used to intentionally trigger an exception?",
+      "options": [
+        "A. throw",
+        "B. panic",
+        "C. raise",
+        "D. except"
+      ],
+      "correct_answer": "C",
+      "explanation": "raise is Python's keyword for creating/propagating exceptions.",
+      "tip": "Example: raise ValueError('bad input')"
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code that raises ValueError if age is negative.",
+      "correct_answer": "if age < 0:\n    raise ValueError('age cannot be negative')",
+      "explanation": "Use raise for invalid-state validation.",
+      "tip": "Raise early when input is invalid.",
+      "code_language": "python"
+    }
+  ],
+  "Python - Data Structures": [
+    {
+      "type": "multiple_choice",
+      "question": "Which data structure stores unique values only?",
+      "options": [
+        "A. list",
+        "B. tuple",
+        "C. set",
+        "D. dict"
+      ],
+      "correct_answer": "C",
+      "explanation": "A set automatically keeps unique elements.",
+      "tip": "Use set for deduplication operations."
+    },
+    {
+      "type": "true_false",
+      "question": "Lists are mutable, tuples are immutable.",
+      "correct_answer": "true",
+      "explanation": "List contents can change; tuple contents cannot.",
+      "tip": "If data should stay fixed, tuple can be safer."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to remove duplicates from list nums while preserving the first occurrence order.",
+      "correct_answer": "seen = set()\nresult = []\nfor n in nums:\n    if n not in seen:\n        seen.add(n)\n        result.append(n)",
+      "explanation": "Track seen values with a set and append unseen values to result.",
+      "tip": "Combine fast set lookup with ordered list output.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What is the difference between == and is in Python?",
+      "options": [
+        "A. No difference",
+        "B. == compares identity, is compares value",
+        "C. == compares value, is compares identity",
+        "D. == only works for numbers"
+      ],
+      "correct_answer": "C",
+      "explanation": "== checks equality of values; is checks object identity.",
+      "tip": "Use is mostly for None checks."
+    },
+    {
+      "type": "fill_blank",
+      "question": "The built-in function that returns an object's memory identity integer is ___.",
+      "correct_answer": "id",
+      "explanation": "id(obj) returns the identity of an object.",
+      "tip": "Identity is implementation-dependent but stable during object lifetime."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which expression returns a slice containing indexes 1 through 3 from list a?",
+      "options": [
+        "A. a[1:4]",
+        "B. a[1:3]",
+        "C. a[0:3]",
+        "D. a[2:4]"
+      ],
+      "correct_answer": "A",
+      "explanation": "Python slices include start and exclude end index.",
+      "tip": "a[start:end] includes start, excludes end."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which method creates a shallow copy of a list?",
+      "options": [
+        "A. copy.deepcopy(lst)",
+        "B. lst.copy()",
+        "C. lst.clone()",
+        "D. list.deep()"
+      ],
+      "correct_answer": "B",
+      "explanation": "lst.copy() creates a shallow copy.",
+      "tip": "Nested mutable items are still shared in shallow copies."
+    },
+    {
+      "type": "open_ended",
+      "question": "What is one key difference between shallow copy and deep copy?",
+      "correct_answer": "A shallow copy duplicates only the outer container, while a deep copy recursively duplicates nested objects too.",
+      "explanation": "Deep copy avoids shared nested references.",
+      "tip": "Use copy.deepcopy when nested mutables must be independent."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to get intersection of sets a and b.",
+      "correct_answer": "common = a & b",
+      "explanation": "Set intersection returns elements present in both sets.",
+      "tip": "Equivalent method: a.intersection(b).",
+      "code_language": "python"
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to sort list nums descending in-place.",
+      "correct_answer": "nums.sort(reverse=True)",
+      "explanation": "list.sort modifies the list directly.",
+      "tip": "Use sorted(nums, reverse=True) for a new list.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which container is insertion-ordered in modern Python and stores key-value pairs?",
+      "options": [
+        "A. set",
+        "B. dict",
+        "C. tuple",
+        "D. frozenset"
+      ],
+      "correct_answer": "B",
+      "explanation": "dict stores key-value pairs and preserves insertion order in Python 3.7+ language spec.",
+      "tip": "Use dict when you need keyed lookup plus predictable iteration order."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to remove key \"temp\" from dictionary d safely (without raising if missing).",
+      "correct_answer": "d.pop('temp', None)",
+      "explanation": "pop with a default removes the key when present and avoids KeyError when absent.",
+      "tip": "Default argument makes dictionary deletion resilient.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which statement about order is correct?",
+      "options": [
+        "A. set is ordered and list is unordered",
+        "B. tuple and list are ordered sequences",
+        "C. dict is always unordered in Python 3.11",
+        "D. all containers are unordered"
+      ],
+      "correct_answer": "B",
+      "explanation": "list and tuple keep element order; set remains unordered.",
+      "tip": "Choose container types based on ordering and uniqueness needs."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to filter only alphabetic strings from list words into new list clean.",
+      "correct_answer": "clean = [w for w in words if isinstance(w, str) and w.isalpha()]",
+      "explanation": "Use a comprehension with type and character checks to filter values.",
+      "tip": "String methods like isalpha help validate input format.",
+      "code_language": "python"
+    },
+    {
+      "type": "fill_blank",
+      "question": "To get the largest value in list nums, use built-in ___.",
+      "correct_answer": "max(nums)",
+      "explanation": "max returns the largest item in an iterable.",
+      "tip": "min(nums) gives the smallest."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code using the built-in `slice()` object to get elements from index 2 to 5 (exclusive) from list arr.",
+      "correct_answer": "part = arr[slice(2, 5)]",
+      "explanation": "slice(start, stop) creates a reusable slice object that works with sequences.",
+      "tip": "Equivalent literal slicing is arr[2:5].",
+      "code_language": "python"
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to normalize string s by trimming spaces and converting it to lowercase.",
+      "correct_answer": "normalized = s.strip().lower()",
+      "explanation": "strip removes surrounding whitespace and lower standardizes casing.",
+      "tip": "Chain string methods for concise transformations.",
+      "code_language": "python"
+    }
+  ],
+  "Python - Scopes and Modules": [
+    {
+      "type": "multiple_choice",
+      "question": "In LEGB, what does G stand for?",
+      "options": [
+        "A. Generic",
+        "B. Group",
+        "C. Global",
+        "D. Given"
+      ],
+      "correct_answer": "C",
+      "explanation": "LEGB = Local, Enclosing, Global, Built-in.",
+      "tip": "Python resolves names from nearest to farthest scope."
+    },
+    {
+      "type": "true_false",
+      "question": "Using import * is usually discouraged in production code.",
+      "correct_answer": "true",
+      "explanation": "import * pollutes namespace and hurts readability.",
+      "tip": "Prefer explicit imports for clarity and tooling support."
+    },
+    {
+      "type": "fill_blank",
+      "question": "The special variable used to guard script entry is if ___ == \"__main__\":",
+      "correct_answer": "__name__",
+      "explanation": "__name__ equals \"__main__\" when the file runs directly.",
+      "tip": "Use this block for CLI/testing code in modules."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which keyword allows assigning to a global variable inside a function?",
+      "options": [
+        "A. global",
+        "B. nonlocal",
+        "C. static",
+        "D. export"
+      ],
+      "correct_answer": "A",
+      "explanation": "global binds assignments to module-level variables.",
+      "tip": "Use sparingly; pass parameters when possible."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which statement about default mutable arguments is correct?",
+      "options": [
+        "A. They reset every call automatically",
+        "B. They are evaluated once at function definition time",
+        "C. They are forbidden in Python",
+        "D. They only affect keyword args"
+      ],
+      "correct_answer": "B",
+      "explanation": "Default values are evaluated once, so mutable defaults can persist state across calls.",
+      "tip": "Use None then create new object inside function."
+    },
+    {
+      "type": "fill_blank",
+      "question": "The file commonly used to mark a Python package directory is ___.",
+      "correct_answer": "__init__.py",
+      "explanation": "__init__.py indicates package semantics and can run initialization code.",
+      "tip": "Modern Python supports namespace packages too."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What does __all__ in a module typically control?",
+      "options": [
+        "A. File permissions",
+        "B. Which names export on from module import *",
+        "C. Runtime speed",
+        "D. Memory allocation"
+      ],
+      "correct_answer": "B",
+      "explanation": "__all__ defines explicit public names for wildcard imports.",
+      "tip": "Even with __all__, explicit imports are usually better."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which built-in returns a dict of the current local symbol table?",
+      "options": [
+        "A. globals()",
+        "B. locals()",
+        "C. vars(__builtins__)",
+        "D. scope()"
+      ],
+      "correct_answer": "B",
+      "explanation": "locals() provides current local namespace mapping.",
+      "tip": "globals() does the same for module scope."
+    },
+    {
+      "type": "true_false",
+      "question": "Circular imports can cause partially initialized modules and runtime errors.",
+      "correct_answer": "true",
+      "explanation": "Import cycles can break name availability during initialization.",
+      "tip": "Refactor shared code into separate module to break cycles."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to reload imported module mymod during interactive development.",
+      "correct_answer": "import importlib\nimportlib.reload(mymod)",
+      "explanation": "importlib.reload re-executes module code.",
+      "tip": "Useful in REPL/notebooks after edits.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which import statement gives module numpy an alias np?",
+      "options": [
+        "A. import numpy as np",
+        "B. from numpy import * as np",
+        "C. import np from numpy",
+        "D. from np import numpy"
+      ],
+      "correct_answer": "A",
+      "explanation": "import module as alias is the standard alias syntax.",
+      "tip": "Aliases can improve readability for commonly used modules."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What does `from math import sqrt` do?",
+      "options": [
+        "A. Imports only sqrt symbol into current namespace",
+        "B. Imports entire math module as sqrt",
+        "C. Defines a new custom sqrt",
+        "D. Fails unless __all__ is set"
+      ],
+      "correct_answer": "A",
+      "explanation": "It imports a specific symbol from the module.",
+      "tip": "Use selective imports when only a few names are needed."
+    },
+    {
+      "type": "coding",
+      "question": "Write a list comprehension that squares numbers in nums only if they are even.",
+      "correct_answer": "squares = [n * n for n in nums if n % 2 == 0]",
+      "explanation": "Comprehensions combine transformation and filtering concisely.",
+      "tip": "Order is expression first, then for, then optional if.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What does vars(obj) typically return?",
+      "options": [
+        "A. The object memory address",
+        "B. A dict-like mapping of the object attributes",
+        "C. Only global variables",
+        "D. A tuple of class methods"
+      ],
+      "correct_answer": "B",
+      "explanation": "vars returns __dict__ when available, exposing attribute mapping.",
+      "tip": "For modules, vars(module) also returns symbol mapping."
+    }
+  ],
+  "Python - Functions": [
+    {
+      "type": "multiple_choice",
+      "question": "Which syntax allows a function to accept arbitrary positional arguments?",
+      "options": [
+        "A. **kwargs",
+        "B. *args",
+        "C. &args",
+        "D. args[]"
+      ],
+      "correct_answer": "B",
+      "explanation": "*args collects extra positional arguments.",
+      "tip": "Use **kwargs for named/key-value extras."
+    },
+    {
+      "type": "true_false",
+      "question": "A pure function should avoid side effects.",
+      "correct_answer": "true",
+      "explanation": "Pure functions depend only on inputs and don't mutate external state.",
+      "tip": "Pure functions are easier to test."
+    },
+    {
+      "type": "coding",
+      "question": "Write a decorator `logger` that prints \"calling\" before running a function.",
+      "correct_answer": "def logger(fn):\n    def wrapper(*args, **kwargs):\n        print('calling')\n        return fn(*args, **kwargs)\n    return wrapper",
+      "explanation": "Decorator returns a wrapper function around original function.",
+      "tip": "Wrapper should return the original function result.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which syntax captures arbitrary keyword arguments in a function?",
+      "options": [
+        "A. *kwargs",
+        "B. **kwargs",
+        "C. kwargs[]",
+        "D. &kwargs"
+      ],
+      "correct_answer": "B",
+      "explanation": "**kwargs collects extra named arguments into a dictionary.",
+      "tip": "Use *args for positional extras."
+    },
+    {
+      "type": "coding",
+      "question": "Write a higher-order function apply_twice(fn, x) that returns fn(fn(x)).",
+      "correct_answer": "def apply_twice(fn, x):\n    return fn(fn(x))",
+      "explanation": "Higher-order functions receive or return other functions.",
+      "tip": "Functions are first-class objects in Python.",
+      "code_language": "python"
+    },
+    {
+      "type": "coding",
+      "question": "Write nested function code where outer() returns inner() and inner adds 1 to captured variable n.",
+      "correct_answer": "def outer(n):\n    def inner():\n        return n + 1\n    return inner",
+      "explanation": "inner closes over n from enclosing scope.",
+      "tip": "Returned inner function keeps access to captured variables.",
+      "code_language": "python"
+    },
+    {
+      "type": "coding",
+      "question": "Write code that uses nonlocal to increment variable count inside nested function inc().",
+      "correct_answer": "def make_counter():\n    count = 0\n    def inc():\n        nonlocal count\n        count += 1\n        return count\n    return inc",
+      "explanation": "nonlocal binds assignment to nearest enclosing (non-global) scope variable.",
+      "tip": "Use nonlocal for closure state updates.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which line correctly defines a lambda that doubles x?",
+      "options": [
+        "A. lambda(x): x*2",
+        "B. def lambda x: x*2",
+        "C. lambda x: x * 2",
+        "D. fn x => x*2"
+      ],
+      "correct_answer": "C",
+      "explanation": "lambda x: x * 2 is valid anonymous function syntax.",
+      "tip": "Keep lambda expressions short and readable."
+    }
+  ],
+  "Python - files": [
+    {
+      "type": "multiple_choice",
+      "question": "Which mode opens a file for append in text mode?",
+      "options": [
+        "A. r",
+        "B. w",
+        "C. a",
+        "D. x"
+      ],
+      "correct_answer": "C",
+      "explanation": "Mode a appends content to end of file.",
+      "tip": "Use with statement to auto-close file."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: with open('data.txt', 'r') as ___:",
+      "correct_answer": "f",
+      "explanation": "Common handle name is f (any valid variable name works).",
+      "tip": "Keep handle names short and clear."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code to save dict `data` to JSON file `out.json`.",
+      "correct_answer": "import json\nwith open('out.json', 'w', encoding='utf-8') as f:\n    json.dump(data, f)",
+      "explanation": "json.dump writes Python objects as JSON into a file handle.",
+      "tip": "Set encoding to utf-8 for safe text handling.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which method reads exactly one line from a file each call?",
+      "options": [
+        "A. read()",
+        "B. readline()",
+        "C. readlines()",
+        "D. lines()"
+      ],
+      "correct_answer": "B",
+      "explanation": "readline() returns one line at a time.",
+      "tip": "readlines() returns a list of all lines."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which method moves the file cursor to a specific position?",
+      "options": [
+        "A. shift()",
+        "B. cursor()",
+        "C. seek()",
+        "D. goto()"
+      ],
+      "correct_answer": "C",
+      "explanation": "seek(offset) repositions the file pointer.",
+      "tip": "tell() shows current cursor position."
+    },
+    {
+      "type": "fill_blank",
+      "question": "To get current cursor position in an open file, call ___.",
+      "correct_answer": "tell()",
+      "explanation": "tell() returns the current stream position.",
+      "tip": "Useful with seek() for random access."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code that writes multiple lines from list lines to a file using writelines.",
+      "correct_answer": "with open('out.txt', 'w', encoding='utf-8') as f:\n    f.writelines(lines)",
+      "explanation": "writelines writes iterable strings as-is.",
+      "tip": "Add '\\n' to each line if you want newlines.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which mode opens a file for both reading and writing without truncating it?",
+      "options": [
+        "A. w",
+        "B. r+",
+        "C. a",
+        "D. x"
+      ],
+      "correct_answer": "B",
+      "explanation": "r+ allows read/write access while preserving existing content.",
+      "tip": "w+ truncates the file first; use carefully."
+    }
+  ],
+  "logs": [
+    {
+      "type": "multiple_choice",
+      "question": "Which log level is usually used for detailed development diagnostics?",
+      "options": [
+        "A. error",
+        "B. warn",
+        "C. info",
+        "D. debug"
+      ],
+      "correct_answer": "D",
+      "explanation": "debug logs are highly detailed and commonly used during development.",
+      "tip": "Use structured logs for easier filtering/search."
+    },
+    {
+      "type": "true_false",
+      "question": "Logs should include context like request id or user id when possible.",
+      "correct_answer": "true",
+      "explanation": "Context makes logs more actionable during troubleshooting.",
+      "tip": "Good logs answer: what happened, where, and for whom."
+    },
+    {
+      "type": "open_ended",
+      "question": "Why are logs better than print statements in production?",
+      "correct_answer": "Logging supports levels, formats, destinations, filtering, and central collection, making troubleshooting and monitoring reliable in production.",
+      "explanation": "Logs provide control and observability that print statements lack.",
+      "tip": "Mention log levels and persistent storage."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which log level is most appropriate for normal successful application events?",
+      "options": [
+        "A. info",
+        "B. error",
+        "C. fatal",
+        "D. trace only"
+      ],
+      "correct_answer": "A",
+      "explanation": "info is used for standard operational messages.",
+      "tip": "Reserve error for failures needing attention."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which statement best describes warning logs?",
+      "options": [
+        "A. They always mean crash occurred",
+        "B. They indicate unusual conditions that might become problems",
+        "C. They are only for startup events",
+        "D. They should include no context fields"
+      ],
+      "correct_answer": "B",
+      "explanation": "Warnings flag non-fatal but notable situations.",
+      "tip": "Warnings can reveal early signs of reliability issues."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python logging setup that logs INFO+ to file app.log with timestamp and level.",
+      "correct_answer": "import logging\nlogging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')",
+      "explanation": "basicConfig can define output file, minimum level, and format.",
+      "tip": "Include timestamp and level to make logs actionable.",
+      "code_language": "python"
+    },
+    {
+      "type": "open_ended",
+      "question": "Why is consistent log format important across services?",
+      "correct_answer": "Consistent formatting enables reliable parsing, correlation, searching, and dashboarding across systems, which speeds diagnosis in distributed environments.",
+      "explanation": "Strong answers mention machine parsing and cross-service observability.",
+      "tip": "Structured logs (e.g., JSON) help automation and analysis."
+    }
+  ],
+  "Python - Iterators and Generators": [
+    {
+      "type": "multiple_choice",
+      "question": "Which keyword is used to create a generator function?",
+      "options": [
+        "A. return",
+        "B. async",
+        "C. yield",
+        "D. next"
+      ],
+      "correct_answer": "C",
+      "explanation": "yield turns a function into a generator.",
+      "tip": "Generators produce values lazily, one at a time."
+    },
+    {
+      "type": "fill_blank",
+      "question": "When an iterator is exhausted, Python raises ___.",
+      "correct_answer": "StopIteration",
+      "explanation": "StopIteration signals no more items are available.",
+      "tip": "for-loops handle StopIteration automatically."
+    },
+    {
+      "type": "coding",
+      "question": "Write a generator `count_up_to(n)` that yields numbers from 1 to n.",
+      "correct_answer": "def count_up_to(n):\n    i = 1\n    while i <= n:\n        yield i\n        i += 1",
+      "explanation": "Use yield inside loop to produce sequence lazily.",
+      "tip": "Update loop counter after each yield.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which pair can manually consume an iterator one item at a time?",
+      "options": [
+        "A. map() and filter()",
+        "B. iter() and next()",
+        "C. zip() and len()",
+        "D. open() and close()"
+      ],
+      "correct_answer": "B",
+      "explanation": "iter() gets iterator object; next() advances it.",
+      "tip": "next(it, default) avoids StopIteration."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What does `yield from subgen` do?",
+      "options": [
+        "A. Closes subgen",
+        "B. Delegates yielding to another iterable/generator",
+        "C. Converts list to set",
+        "D. Forces eager evaluation"
+      ],
+      "correct_answer": "B",
+      "explanation": "yield from passes through yielded values from sub-generator.",
+      "tip": "Useful for composing generator pipelines."
+    },
+    {
+      "type": "true_false",
+      "question": "Generator expressions are generally more memory-efficient than building full lists.",
+      "correct_answer": "true",
+      "explanation": "They produce values lazily instead of storing all at once.",
+      "tip": "Use (...) for generator expression, not [...]."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code using itertools.count to create an infinite counter starting at 10.",
+      "correct_answer": "import itertools\ncounter = itertools.count(10)",
+      "explanation": "itertools.count returns an infinite iterator.",
+      "tip": "Be careful to limit consumption of infinite iterators.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which generator method injects an exception into the generator?",
+      "options": [
+        "A. send()",
+        "B. throw()",
+        "C. close()",
+        "D. raise()"
+      ],
+      "correct_answer": "B",
+      "explanation": "throw() raises an exception at the yield point inside generator.",
+      "tip": "close() signals normal termination via GeneratorExit."
+    },
+    {
+      "type": "coding",
+      "question": "Write generator code that receives values via send() and yields running total.",
+      "correct_answer": "def running_total():\n    total = 0\n    while True:\n        x = yield total\n        if x is not None:\n            total += x",
+      "explanation": "send passes values into generator at the yield expression.",
+      "tip": "Prime the generator first with next(gen) before send.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What does gen.close() do for a generator?",
+      "options": [
+        "A. Resets it to start",
+        "B. Raises GeneratorExit inside and terminates iteration",
+        "C. Converts it to list",
+        "D. Makes it reusable"
+      ],
+      "correct_answer": "B",
+      "explanation": "close injects GeneratorExit, stopping the generator cleanly.",
+      "tip": "After close, further next calls raise StopIteration."
+    },
+    {
+      "type": "coding",
+      "question": "Write code that chains two generators g1 and g2 into one stream using yield from.",
+      "correct_answer": "def chained(g1, g2):\n    yield from g1\n    yield from g2",
+      "explanation": "yield from delegates iteration to sub-generators in sequence.",
+      "tip": "Useful for pipeline composition and readability.",
+      "code_language": "python"
+    }
+  ],
+  "Python - Classes and Inheritance": [
+    {
+      "type": "multiple_choice",
+      "question": "What is `self` in a Python instance method?",
+      "options": [
+        "A. Class name",
+        "B. Current object instance",
+        "C. Parent class",
+        "D. Global scope"
+      ],
+      "correct_answer": "B",
+      "explanation": "self refers to the current instance of the class.",
+      "tip": "Instance attributes are usually accessed via self.attr."
+    },
+    {
+      "type": "true_false",
+      "question": "A subclass can override methods from a parent class.",
+      "correct_answer": "true",
+      "explanation": "Method overriding lets subclasses provide specialized behavior.",
+      "tip": "Use super() when you still need parent behavior."
+    },
+    {
+      "type": "coding",
+      "question": "Create class Animal with method speak() returning '...'; create Dog subclass overriding speak() to return 'woof'.",
+      "correct_answer": "class Animal:\n    def speak(self):\n        return '...'\n\nclass Dog(Animal):\n    def speak(self):\n        return 'woof'",
+      "explanation": "Dog inherits Animal and overrides speak.",
+      "tip": "Override by defining same method name in subclass.",
+      "code_language": "python"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What is __init__ in a Python class?",
+      "options": [
+        "A. Class destructor",
+        "B. Module loader",
+        "C. Instance initializer constructor method",
+        "D. Static analyzer"
+      ],
+      "correct_answer": "C",
+      "explanation": "__init__ runs when creating a new instance.",
+      "tip": "Use it to set initial instance state."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which statement best describes class vs instance attributes?",
+      "options": [
+        "A. Both are always unique per object",
+        "B. Class attributes are shared; instance attributes are per-object",
+        "C. Instance attributes are shared by all objects",
+        "D. Class attributes cannot be changed"
+      ],
+      "correct_answer": "B",
+      "explanation": "Class attrs live on the class; instance attrs live on each object.",
+      "tip": "self.x creates/updates instance attributes."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which function checks if obj is instance of MyClass or its subclasses?",
+      "options": [
+        "A. typecheck(obj, MyClass)",
+        "B. classof(obj)",
+        "C. isinstance(obj, MyClass)",
+        "D. issubclass(obj, MyClass)"
+      ],
+      "correct_answer": "C",
+      "explanation": "isinstance works with objects; issubclass works with classes.",
+      "tip": "Use issubclass(Child, Parent) for classes."
+    },
+    {
+      "type": "true_false",
+      "question": "Python lets you add attributes to objects dynamically in many cases.",
+      "correct_answer": "true",
+      "explanation": "By default, many objects allow adding attributes at runtime.",
+      "tip": "Classes with __slots__ can restrict this."
+    },
+    {
+      "type": "open_ended",
+      "question": "What is polymorphism in OOP?",
+      "correct_answer": "Polymorphism means different classes can provide the same interface/method name with behavior specific to each class.",
+      "explanation": "Strong answers mention shared interface, different implementations.",
+      "tip": "Example: multiple classes implement speak() differently."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What is the key difference between a function and an instance method in Python?",
+      "options": [
+        "A. Functions can return values, methods cannot",
+        "B. Methods are defined inside classes and receive instance context (`self`)",
+        "C. Methods only work with integers",
+        "D. There is no difference"
+      ],
+      "correct_answer": "B",
+      "explanation": "Instance methods belong to class instances and conventionally use `self` to access object state.",
+      "tip": "Method call syntax passes instance automatically."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "If a class does not define `__init__`, what happens when you create an object?",
+      "options": [
+        "A. Python raises SyntaxError",
+        "B. Object creation fails unless a parent has `__init__`",
+        "C. Python uses inherited/default initialization and still creates the object",
+        "D. Class cannot be instantiated"
+      ],
+      "correct_answer": "C",
+      "explanation": "A class can be instantiated without its own `__init__`; Python falls back to parent/default behavior.",
+      "tip": "Define `__init__` only when you need custom initialization."
+    },
+    {
+      "type": "coding",
+      "question": "Write Python code that checks whether variable obj is exactly of type list (not just subclass).",
+      "correct_answer": "is_exact_list = type(obj) is list",
+      "explanation": "type(obj) returns the concrete class, and identity check confirms exact type match.",
+      "tip": "Use isinstance for subclass-friendly checks.",
+      "code_language": "python"
+    }
+  ],
+  "DB - SQL": [
+    {
+      "type": "multiple_choice",
+      "question": "Which clause is used to sort query results?",
+      "options": [
+        "A. FILTER",
+        "B. ORDER BY",
+        "C. GROUP",
+        "D. HAVING"
+      ],
+      "correct_answer": "B",
+      "explanation": "ORDER BY sorts rows by one or more columns.",
+      "tip": "Use ASC for ascending, DESC for descending."
+    },
+    {
+      "type": "fill_blank",
+      "question": "Complete: SELECT name FROM users ___ age >= 18;",
+      "correct_answer": "WHERE",
+      "explanation": "WHERE filters rows before output.",
+      "tip": "Think: WHERE = condition for rows."
+    },
+    {
+      "type": "coding",
+      "question": "Write SQL to show each department and number of employees from table employees(department, id).",
+      "correct_answer": "SELECT department, COUNT(id) AS employees_count\nFROM employees\nGROUP BY department;",
+      "explanation": "COUNT with GROUP BY aggregates rows per department.",
+      "tip": "Every non-aggregated selected column must appear in GROUP BY.",
+      "code_language": "sql"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which SQL keyword is used to choose specific columns from a table?",
+      "options": [
+        "A. PROJECT",
+        "B. SELECT",
+        "C. FILTER",
+        "D. CHOOSE"
+      ],
+      "correct_answer": "B",
+      "explanation": "SELECT defines the projection columns.",
+      "tip": "SELECT * fetches all columns."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which condition operator checks whether a value is inside a set of options?",
+      "options": [
+        "A. LIKE",
+        "B. BETWEEN",
+        "C. IN",
+        "D. EXISTS ONLY"
+      ],
+      "correct_answer": "C",
+      "explanation": "IN matches against a list or subquery result.",
+      "tip": "Example: WHERE status IN ('open','pending')."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which aggregate function returns the average of numeric values?",
+      "options": [
+        "A. SUM()",
+        "B. AVG()",
+        "C. COUNT()",
+        "D. MEDIAN()"
+      ],
+      "correct_answer": "B",
+      "explanation": "AVG computes arithmetic mean.",
+      "tip": "Use GROUP BY to compute per-group averages."
+    },
+    {
+      "type": "fill_blank",
+      "question": "To return only the first 10 rows in many SQL dialects, add ___.",
+      "correct_answer": "LIMIT 10",
+      "explanation": "LIMIT restricts number of result rows.",
+      "tip": "Some dialects use TOP instead."
+    },
+    {
+      "type": "coding",
+      "question": "Write SQL that returns employee names containing 'son' sorted by name ascending.",
+      "correct_answer": "SELECT name\nFROM employees\nWHERE name LIKE '%son%'\nORDER BY name ASC;",
+      "explanation": "LIKE performs pattern matching; ORDER BY sorts results.",
+      "tip": "% matches any sequence of characters.",
+      "code_language": "sql"
+    }
+  ],
+  "HTTP and Servers": [
+    {
+      "type": "multiple_choice",
+      "question": "What does HTTPS add compared to HTTP?",
+      "options": [
+        "A. Caching only",
+        "B. Compression only",
+        "C. Encryption via TLS",
+        "D. DNS resolution"
+      ],
+      "correct_answer": "C",
+      "explanation": "HTTPS uses TLS to encrypt data in transit.",
+      "tip": "HTTPS protects confidentiality and integrity."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which command-line tool is commonly used to test HTTP endpoints?",
+      "options": [
+        "A. curl",
+        "B. chmod",
+        "C. ps",
+        "D. top"
+      ],
+      "correct_answer": "A",
+      "explanation": "curl can send HTTP requests from terminal.",
+      "tip": "Start with: curl -X GET <url>."
+    },
+    {
+      "type": "open_ended",
+      "question": "Explain the client-server model in 2-3 sentences.",
+      "correct_answer": "A client sends requests to a server over a network. The server processes requests (often using business logic and databases) and sends back responses.",
+      "explanation": "Good answers describe request/response responsibilities.",
+      "tip": "Mention roles: client initiates, server responds."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "What is DNS primarily used for?",
+      "options": [
+        "A. Encrypting passwords",
+        "B. Mapping domain names to IP addresses",
+        "C. Compressing HTML",
+        "D. Managing SQL schemas"
+      ],
+      "correct_answer": "B",
+      "explanation": "DNS resolves domain names into IP addresses.",
+      "tip": "Browsers rely on DNS before opening TCP connections."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which HTTP method is typically used to create a new resource?",
+      "options": [
+        "A. GET",
+        "B. POST",
+        "C. DELETE",
+        "D. HEAD"
+      ],
+      "correct_answer": "B",
+      "explanation": "POST is commonly used for create operations in REST APIs.",
+      "tip": "GET should be safe/read-only."
+    },
+    {
+      "type": "fill_blank",
+      "question": "A Python virtual environment is commonly created with: python -m ___.",
+      "correct_answer": "venv",
+      "explanation": "venv creates isolated Python dependency environments.",
+      "tip": "Activate it before installing project packages."
+    },
+    {
+      "type": "true_false",
+      "question": "FastAPI is a Python framework often used to build HTTP APIs.",
+      "correct_answer": "true",
+      "explanation": "FastAPI is a modern Python web framework for APIs.",
+      "tip": "It provides validation and automatic docs."
+    },
+    {
+      "type": "open_ended",
+      "question": "Why would a server application use a database like PostgreSQL or MongoDB?",
+      "correct_answer": "Databases provide persistent storage, querying, and consistency for application data beyond server process memory.",
+      "explanation": "Strong answers mention persistence and data operations.",
+      "tip": "Without DB, data usually disappears on restart."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which status code range represents client errors?",
+      "options": [
+        "A. 1xx",
+        "B. 2xx",
+        "C. 4xx",
+        "D. 5xx"
+      ],
+      "correct_answer": "C",
+      "explanation": "4xx codes indicate request problems on the client side.",
+      "tip": "5xx usually indicates server-side failures."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which status code usually means the requested resource was not found?",
+      "options": [
+        "A. 200",
+        "B. 201",
+        "C. 404",
+        "D. 500"
+      ],
+      "correct_answer": "C",
+      "explanation": "404 Not Found indicates the server cannot find the target resource.",
+      "tip": "Differentiate 404 (missing route/resource) from 500 (server error)."
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which statement best describes a common difference between PostgreSQL and MongoDB?",
+      "options": [
+        "A. PostgreSQL is relational SQL-based, MongoDB is document-oriented NoSQL",
+        "B. MongoDB only stores CSV files",
+        "C. PostgreSQL cannot run on servers",
+        "D. They are identical except for command syntax"
+      ],
+      "correct_answer": "A",
+      "explanation": "PostgreSQL is a relational database with SQL and strict schemas, while MongoDB stores flexible JSON-like documents.",
+      "tip": "Choose based on data model and query requirements."
+    }
+  ]
+}
