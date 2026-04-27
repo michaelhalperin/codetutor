@@ -9,6 +9,7 @@ const SEED_PATH = join(__dirname, '../data/questionBank.json')
 // Load the seed bank once at startup
 const SEED_BANK = JSON.parse(readFileSync(SEED_PATH, 'utf8'))
 const MIN_SEED_QUESTIONS_PER_TOPIC = 30
+const DIFFICULTY_LEVELS = ['beginner', 'intermediate', 'advanced']
 const TOPIC_SEED_ALIASES = {
   'מבוא למחשבים': 'Data Structures',
   'מבנה המחשב': 'Data Structures',
@@ -29,6 +30,8 @@ const TOPIC_SEED_ALIASES = {
   logs: 'Python Basics',
   'HTTP and Servers': 'JavaScript',
 }
+const TOPIC_WARM_TTL_MS = 10 * 60 * 1000
+const topicWarmState = new Map()
 
 // ============================================================
 // Main entry: serve questions for a session.
@@ -41,18 +44,18 @@ const TOPIC_SEED_ALIASES = {
 //  4. If not enough unseen questions exist, reuse previously seen questions
 //  5. Record which questions are being served in this session
 // ============================================================
-export async function getQuestionsForSession({ userId, topic, difficulty, count, sessionId }) {
-  // Step 1: Ensure seed questions are in the DB for this topic
-  await ensureSeedQuestions(topic)
+export async function getQuestionsForSession({ userId, topic, difficulty, count, sessionId, experimentConfig }) {
+  // Step 1: Fast path first — avoid expensive preparation unless topic has no data.
+  let bankQuestions = await fetchBankQuestions(topic)
+  if (!bankQuestions || bankQuestions.length === 0) {
+    await ensureSeedQuestions(topic)
+    bankQuestions = await fetchBankQuestions(topic)
+  }
+  // Never block user requests on difficulty backfill.
+  queueTopicBackfill(topic)
+  const normalizedDifficulty = normalizeDifficulty(difficulty)
 
-  // Step 2: Fetch all bank questions for this topic (any difficulty is fine —
-  //         difficulty is applied as a filter for AI-generated questions)
-  const { data: bankQuestions, error: bankErr } = await supabase
-    .from('question_bank')
-    .select('*')
-    .eq('topic', topic)
-
-  if (bankErr) throw bankErr
+  // Step 2: Use prepared bank questions for this topic.
   if (!bankQuestions || bankQuestions.length === 0) {
     throw new Error(`No questions are configured for topic "${topic}" yet.`)
   }
@@ -61,6 +64,7 @@ export async function getQuestionsForSession({ userId, topic, difficulty, count,
   const dedupedBankQuestions = Array.from(
     new Map(bankQuestions.map((q) => [canonicalizeQuestionText(q.question_text), q])).values()
   )
+  const preferredPool = pickDifficultyPool(dedupedBankQuestions, normalizedDifficulty)
 
   // Step 3: Find which ones this user has NOT answered yet
   const { data: seen, error: seenErr } = await supabase
@@ -73,11 +77,11 @@ export async function getQuestionsForSession({ userId, topic, difficulty, count,
 
   const seenIds = new Set(seen.map((s) => s.question_bank_id))
   const seenCanonical = new Set(
-    bankQuestions
+    preferredPool
       .filter((q) => seenIds.has(q.id))
       .map((q) => canonicalizeQuestionText(q.question_text))
   )
-  let unseen = dedupedBankQuestions.filter(
+  let unseen = preferredPool.filter(
     (q) => !seenCanonical.has(canonicalizeQuestionText(q.question_text))
   )
 
@@ -91,7 +95,7 @@ export async function getQuestionsForSession({ userId, topic, difficulty, count,
       .delete()
       .eq('user_id', userId)
       .eq('topic', topic)
-    unseen = shuffle(dedupedBankQuestions)
+    unseen = shuffle(preferredPool)
   }
 
   // If the canonical pool is smaller than requested, return as many distinct
@@ -100,6 +104,10 @@ export async function getQuestionsForSession({ userId, topic, difficulty, count,
     selected = unseen
   } else {
     selected = shuffle(unseen).slice(0, count)
+  }
+
+  if (experimentConfig?.questionOrder === 'grouped_by_type') {
+    selected = selected.sort((a, b) => String(a.question_type).localeCompare(String(b.question_type)))
   }
 
   // Step 4: Record these questions as "seen" for this user
@@ -136,6 +144,9 @@ export async function getQuestionsForSession({ userId, topic, difficulty, count,
   // Return in the shape the client expects
   return savedSessionQs.map((sq) => {
     const { explanation, tip } = splitExplanationAndTip(sq.ai_feedback)
+    const finalTip = experimentConfig?.hintStyle === 'short'
+      ? toShortTip(tip)
+      : tip
     return {
       id:             sq.id,
       type:           sq.question_type,
@@ -143,10 +154,36 @@ export async function getQuestionsForSession({ userId, topic, difficulty, count,
       options:        sq.options,
       correct_answer: sq.correct_answer,
       explanation,
-      tip,
+      tip: finalTip,
       code_language:  sq.code_language,
     }
   })
+}
+
+async function fetchBankQuestions(topic) {
+  const { data, error } = await supabase
+    .from('question_bank')
+    .select('*')
+    .eq('topic', topic)
+  if (error) throw error
+  return data || []
+}
+
+function queueTopicBackfill(topic) {
+  const now = Date.now()
+  const state = topicWarmState.get(topic)
+  if (state?.running) return
+  if (state?.warmedAt && now - state.warmedAt < TOPIC_WARM_TTL_MS) return
+
+  const running = (async () => {
+    try {
+      await backfillSeedDifficulties(topic)
+      topicWarmState.set(topic, { warmedAt: Date.now(), running: null })
+    } catch {
+      topicWarmState.delete(topic)
+    }
+  })()
+  topicWarmState.set(topic, { warmedAt: state?.warmedAt || 0, running })
 }
 
 // ============================================================
@@ -175,7 +212,7 @@ async function ensureSeedQuestions(topic) {
     .filter((q) => !existingCanonicalTexts.has(canonicalizeQuestionText(q.question)))
     .map((q) => ({
     topic,
-    difficulty:     'mixed',      // seed questions cover all levels
+    difficulty:     normalizeDifficulty(q.difficulty) || inferQuestionDifficulty(q),
     question_type:  q.type,
     question_text:  q.question,
     options:        q.options || null,
@@ -188,6 +225,99 @@ async function ensureSeedQuestions(topic) {
   if (rows.length > 0) {
     await supabase.from('question_bank').insert(rows)
   }
+}
+
+async function backfillSeedDifficulties(topic) {
+  const { data: seedRows, error } = await supabase
+    .from('question_bank')
+    .select('id,difficulty,question_type,question_text,options,correct_answer,code_language')
+    .eq('topic', topic)
+    .eq('source', 'seed')
+
+  if (error) throw error
+  if (!seedRows || seedRows.length === 0) return
+
+  const updates = seedRows
+    .filter((row) => !normalizeDifficulty(row.difficulty))
+    .map((row) => ({
+      id: row.id,
+      difficulty: inferQuestionDifficulty({
+        type: row.question_type,
+        question: row.question_text,
+        options: row.options,
+        correct_answer: row.correct_answer,
+        code_language: row.code_language,
+      }),
+    }))
+
+  if (updates.length === 0) return
+  await Promise.all(
+    updates.map((u) =>
+      supabase
+        .from('question_bank')
+        .update({ difficulty: u.difficulty })
+        .eq('id', u.id)
+    )
+  )
+}
+
+function normalizeDifficulty(value) {
+  const normalized = String(value || '').trim().toLowerCase()
+  return DIFFICULTY_LEVELS.includes(normalized) ? normalized : null
+}
+
+function pickDifficultyPool(questions, requestedDifficulty) {
+  const normalized = normalizeDifficulty(requestedDifficulty) || 'intermediate'
+  const byDifficulty = questions.reduce((acc, q) => {
+    const key = normalizeDifficulty(q.difficulty) || inferQuestionDifficulty({
+      type: q.question_type,
+      question: q.question_text,
+      options: q.options,
+      correct_answer: q.correct_answer,
+      code_language: q.code_language,
+    })
+    if (!acc[key]) acc[key] = []
+    acc[key].push(q)
+    return acc
+  }, {})
+
+  const order = getDifficultyFallbackOrder(normalized)
+  const merged = []
+  for (const level of order) {
+    merged.push(...(byDifficulty[level] || []))
+  }
+  return merged.length > 0 ? merged : questions
+}
+
+function getDifficultyFallbackOrder(difficulty) {
+  if (difficulty === 'beginner') return ['beginner', 'intermediate', 'advanced']
+  if (difficulty === 'advanced') return ['advanced', 'intermediate', 'beginner']
+  return ['intermediate', 'beginner', 'advanced']
+}
+
+function inferQuestionDifficulty(question) {
+  const type = String(question?.type || question?.question_type || '').toLowerCase()
+  const text = String(question?.question || question?.question_text || '').toLowerCase()
+  const optionsCount = Array.isArray(question?.options) ? question.options.length : 0
+  const words = text.split(/\s+/).filter(Boolean).length
+  let score = 0
+
+  if (type === 'coding' || type === 'open_ended') score += 2
+  if (type === 'fill_blank') score += 1
+  if (optionsCount >= 5) score += 1
+  if (words >= 20) score += 2
+  else if (words >= 12) score += 1
+  if (question?.code_language) score += 1
+  if (/(explain|compare|diagnose|analyze|design|architecture|trade[- ]?off|why)/.test(text)) {
+    score += 2
+  }
+  if (/(what is|complete|true|false|which|name|define)/.test(text)) {
+    score -= 1
+  }
+
+  if (score >= 4) return 'advanced'
+  if (score <= 1) return 'beginner'
+  return 'intermediate'
 }
 
 function shuffle(arr) {
@@ -215,6 +345,12 @@ function splitExplanationAndTip(value) {
     explanation: raw.slice(0, idx).trim() || null,
     tip: raw.slice(idx + marker.length).trim() || null,
   }
+}
+
+function toShortTip(value) {
+  const raw = String(value || '').trim()
+  if (!raw) return null
+  return raw.split(/[.!?]/).map((part) => part.trim()).filter(Boolean)[0] || raw
 }
 
 function expandSeedQuestions(seedQuestions, targetCount) {

@@ -1,52 +1,69 @@
 import { Router } from 'express'
 import { supabase } from '../services/db.js'
+import { withCache } from '../services/cache.js'
+import { recordRequest } from '../services/metrics.js'
 
 const router = Router()
 
 // GET /api/dashboard — full dashboard data for the logged-in user
 router.get('/', async (req, res) => {
+  const startedAt = Date.now()
   const userId = req.user.id
+  const cacheKey = `dashboard:${userId}`
+  try {
+    const payload = await withCache({
+      key: cacheKey,
+      ttlMs: 30 * 1000,
+      loader: async () => {
+        // Completed sessions (used for recent list + topic aggregation)
+        const { data: completedSessions, error: sessErr } = await supabase
+          .from('sessions')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('completed', true)
+          .order('completed_at', { ascending: false })
 
-  // Completed sessions (used for recent list + topic aggregation)
-  const { data: completedSessions, error: sessErr } = await supabase
-    .from('sessions')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('completed', true)
-    .order('completed_at', { ascending: false })
+        if (sessErr) throw sessErr
 
-  if (sessErr) return res.status(500).json({ error: sessErr.message })
+        const recentSessions = (completedSessions || []).slice(0, 10)
+        const topicStats = aggregateTopicStats(completedSessions || [])
 
-  const recentSessions = (completedSessions || []).slice(0, 10)
-  const topicStats = aggregateTopicStats(completedSessions || [])
+        // Overall stats
+        const totalSessions = (completedSessions || []).length
+        const totalQuestions = (completedSessions || []).reduce(
+          (sum, s) => sum + Number(s.total_questions || 0),
+          0
+        )
+        const totalCorrectAnswers = (completedSessions || []).reduce(
+          (sum, s) => sum + Number(s.correct_answers || 0),
+          0
+        )
+        const avgScore = totalSessions > 0
+          ? Math.round((totalCorrectAnswers / Math.max(1, totalQuestions)) * 100)
+          : 0
 
-  // Overall stats
-  const totalSessions = (completedSessions || []).length
-  const totalQuestions = (completedSessions || []).reduce(
-    (sum, s) => sum + Number(s.total_questions || 0),
-    0
-  )
-  const totalCorrectAnswers = (completedSessions || []).reduce(
-    (sum, s) => sum + Number(s.correct_answers || 0),
-    0
-  )
-  const avgScore = totalSessions > 0
-    ? Math.round((totalCorrectAnswers / Math.max(1, totalQuestions)) * 100)
-    : 0
+        // Streak: count consecutive days with at least one session
+        const streak = calculateStreak(completedSessions || [])
 
-  // Streak: count consecutive days with at least one session
-  const streak = calculateStreak(completedSessions || [])
+        return {
+          recentSessions,
+          topicStats,
+          overview: {
+            totalSessions,
+            totalQuestions,
+            avgScore,
+            streak,
+          },
+        }
+      },
+    })
 
-  res.json({
-    recentSessions,
-    topicStats,
-    overview: {
-      totalSessions,
-      totalQuestions,
-      avgScore,
-      streak,
-    },
-  })
+    recordRequest({ route: '/api/dashboard', latencyMs: Date.now() - startedAt, failed: false })
+    res.json(payload)
+  } catch (error) {
+    recordRequest({ route: '/api/dashboard', latencyMs: Date.now() - startedAt, failed: true })
+    res.status(500).json({ error: error.message })
+  }
 })
 
 function calculateStreak(sessions) {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, Trash2, XCircle } from 'lucide-react'
+import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, PlayCircle, Trash2, XCircle } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import toast from 'react-hot-toast'
 import { deleteSession, getSessions } from '../lib/api'
@@ -118,6 +118,11 @@ export default function Sessions() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                   <div>
                     <p className="text-white font-semibold">{s.topic}</p>
+                    {isAdmin && (
+                      <p className="text-slate-500 text-xs">
+                        User: {s.user_name || s.user_id || 'Unknown user'}
+                      </p>
+                    )}
                     <p className="text-slate-400 text-sm capitalize">{s.difficulty}</p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -140,6 +145,23 @@ export default function Sessions() {
                       >
                         <Trash2 size={14} />
                         {deletingId === s.id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    )}
+                    {!s.completed && (
+                      <button
+                        onClick={() => navigate('/session', {
+                          state: {
+                            session: s,
+                            topic: s.topic,
+                            difficulty: s.difficulty,
+                            count: s.total_questions || 5,
+                            resumeSession: true,
+                          },
+                        })}
+                        className="inline-flex items-center gap-1.5 text-xs text-primary-200 hover:text-white bg-primary-700/30 hover:bg-primary-700/50 border border-primary-600/40 px-2.5 py-1 rounded-full transition"
+                      >
+                        <PlayCircle size={14} />
+                        Resume
                       </button>
                     )}
                   </div>

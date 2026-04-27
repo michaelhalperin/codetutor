@@ -1,22 +1,63 @@
 import { Router } from 'express'
 import { supabase } from '../services/db.js'
+import { deleteCacheByPrefix, withCache } from '../services/cache.js'
+import { recordRequest } from '../services/metrics.js'
 
 const router = Router()
 
 // GET /api/sessions — full session history for the logged-in user
 router.get('/', async (req, res) => {
-  const query = supabase
-    .from('sessions')
-    .select('*')
-    .order('completed_at', { ascending: false })
+  const startedAt = Date.now()
+  const cacheKey = `sessions:${req.user.id}:${req.auth?.isAdmin ? 'admin' : 'user'}`
+  try {
+    const payload = await withCache({
+      key: cacheKey,
+      ttlMs: 30 * 1000,
+      loader: async () => {
+        const query = supabase
+          .from('sessions')
+          .select('*')
+          .order('completed_at', { ascending: false })
 
-  if (!req.auth?.isAdmin) {
-    query.eq('user_id', req.user.id)
+        if (!req.auth?.isAdmin) {
+          query.eq('user_id', req.user.id)
+        }
+
+        const { data, error } = await query
+        if (error) throw error
+
+        const isAdmin = Boolean(req.auth?.isAdmin)
+        let sessions = data || []
+
+        if (isAdmin) {
+          const userIds = [...new Set(sessions.map((session) => session.user_id).filter(Boolean))]
+          let usersById = new Map()
+
+          if (userIds.length > 0) {
+            const { data: profiles, error: profilesError } = await supabase
+              .from('profiles')
+              .select('id,full_name')
+              .in('id', userIds)
+
+            if (profilesError) throw profilesError
+            usersById = new Map((profiles || []).map((profile) => [profile.id, profile.full_name || null]))
+          }
+
+          sessions = sessions.map((session) => ({
+            ...session,
+            user_name: usersById.get(session.user_id) || null,
+          }))
+        }
+        return { sessions, isAdmin }
+      },
+    })
+
+    recordRequest({ route: '/api/sessions', latencyMs: Date.now() - startedAt, failed: false })
+    res.json(payload)
+  } catch (error) {
+    recordRequest({ route: '/api/sessions', latencyMs: Date.now() - startedAt, failed: true })
+    return res.status(500).json({ error: error.message })
   }
-
-  const { data, error } = await query
-  if (error) return res.status(500).json({ error: error.message })
-  res.json({ sessions: data || [], isAdmin: Boolean(req.auth?.isAdmin) })
 })
 
 // POST /api/sessions — create a new session
@@ -33,7 +74,31 @@ router.post('/', async (req, res) => {
     .single()
 
   if (error) return res.status(500).json({ error: error.message })
+  deleteCacheByPrefix(`sessions:${req.user.id}:`)
   res.json({ session: data })
+})
+
+// GET /api/sessions/:id/resume — fetch existing questions for unfinished session
+router.get('/:id/resume', async (req, res) => {
+  const { id } = req.params
+  const { data: session, error: sessionError } = await supabase
+    .from('sessions')
+    .select('*')
+    .eq('id', id)
+    .eq('user_id', req.user.id)
+    .single()
+
+  if (sessionError) return res.status(500).json({ error: sessionError.message })
+  if (!session) return res.status(404).json({ error: 'Session not found.' })
+
+  const { data: questions, error: questionsError } = await supabase
+    .from('questions')
+    .select('*')
+    .eq('session_id', id)
+    .eq('user_id', req.user.id)
+
+  if (questionsError) return res.status(500).json({ error: questionsError.message })
+  res.json({ session, questions: questions || [] })
 })
 
 // PATCH /api/sessions/:id/complete — mark session done and save score
@@ -93,6 +158,9 @@ router.patch('/:id/complete', async (req, res) => {
     })
   }
 
+  deleteCacheByPrefix(`sessions:${req.user.id}:`)
+  deleteCacheByPrefix(`dashboard:${req.user.id}`)
+  deleteCacheByPrefix('admin:analytics')
   res.json({ session, scorePercent })
 })
 
@@ -109,6 +177,9 @@ router.delete('/:id', async (req, res) => {
     .eq('id', id)
 
   if (error) return res.status(500).json({ error: error.message })
+  deleteCacheByPrefix('sessions:')
+  deleteCacheByPrefix('dashboard:')
+  deleteCacheByPrefix('admin:analytics')
   res.json({ ok: true })
 })
 

@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import Navbar from '../components/Navbar'
-import { fetchQuestions, evaluateSession, completeSession } from '../lib/api'
+import { fetchQuestions, evaluateSession, completeSession, getSessionResume } from '../lib/api'
 import toast from 'react-hot-toast'
 import {
   ChevronRight, Loader2,
@@ -21,14 +21,54 @@ export default function Session() {
   const { state } = useLocation()
   const navigate = useNavigate()
   const { session, topic, difficulty, count } = state || {}
+  const localProgressKey = useMemo(
+    () => (session?.id ? `session-progress:${session.id}` : null),
+    [session?.id]
+  )
+  const persistedProgress = useMemo(() => {
+    if (!localProgressKey) return null
+    try {
+      const raw = localStorage.getItem(localProgressKey)
+      return raw ? JSON.parse(raw) : null
+    } catch {
+      return null
+    }
+  }, [localProgressKey])
 
   const [questions, setQuestions]         = useState([])
-  const [currentIdx, setCurrentIdx]       = useState(0)
-  const [answersById, setAnswersById]     = useState({})       // { [questionId]: userAnswer }
+  const [currentIdx, setCurrentIdx]       = useState(() => persistedProgress?.currentIdx || 0)
+  const [answersById, setAnswersById]     = useState(() => persistedProgress?.answersById || {})       // { [questionId]: userAnswer }
   const [tipsOpenById, setTipsOpenById]   = useState({})       // { [questionId]: boolean }
   const [loadingQuestions, setLoadingQuestions] = useState(true)
   const [finishing, setFinishing]         = useState(false)
   const didLoadRef = useRef(false)
+
+  const loadQuestions = async () => {
+    try {
+      if (state?.resumeSession) {
+        const { data } = await getSessionResume(session.id)
+        const resumed = (data.questions || []).map((sq) => ({
+          id: sq.id,
+          type: sq.question_type,
+          question: sq.question_text,
+          options: sq.options,
+          correct_answer: sq.correct_answer,
+          code_language: sq.code_language,
+        }))
+        if (resumed.length > 0) {
+          setQuestions(resumed)
+          return
+        }
+      }
+      const { data } = await fetchQuestions(topic, difficulty, count, session.id)
+      setQuestions(data.questions)
+    } catch {
+      toast.error('Failed to load questions. Please try again.')
+      navigate('/topics')
+    } finally {
+      setLoadingQuestions(false)
+    }
+  }
 
   useEffect(() => {
     if (didLoadRef.current) return
@@ -37,21 +77,15 @@ export default function Session() {
       navigate('/topics')
       return
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadQuestions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const loadQuestions = async () => {
-    try {
-      const { data } = await fetchQuestions(topic, difficulty, count, session.id)
-      setQuestions(data.questions)
-    } catch (err) {
-      const message = err?.response?.data?.error || 'Failed to load questions. Please try again.'
-      toast.error(message)
-      navigate('/topics')
-    } finally {
-      setLoadingQuestions(false)
-    }
-  }
+  useEffect(() => {
+    if (!localProgressKey) return
+    localStorage.setItem(localProgressKey, JSON.stringify({ answersById, currentIdx }))
+  }, [answersById, currentIdx, localProgressKey])
 
   const currentQ  = questions[currentIdx]
   const isLast    = currentIdx === questions.length - 1
@@ -119,12 +153,13 @@ export default function Session() {
         totalQuestions: questions.length,
         correctAnswers: correct,
       })
+      if (localProgressKey) localStorage.removeItem(localProgressKey)
 
       // 3. Navigate to results
       navigate('/results', {
         state: { topic, difficulty, results: mergedResults, questions, sessionId: session.id }
       })
-    } catch (err) {
+    } catch {
       toast.error('Failed to submit session. Please try again.')
       setFinishing(false)
     }

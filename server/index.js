@@ -7,6 +7,7 @@ import questionsRouter from './routes/questions.js'
 import sessionsRouter from './routes/sessions.js'
 import dashboardRouter from './routes/dashboard.js'
 import adminRouter from './routes/admin.js'
+import accountRouter from './routes/account.js'
 import { authenticate } from './middleware/auth.js'
 
 const app = express()
@@ -64,6 +65,7 @@ app.use('/api/questions', questionsRouter)
 app.use('/api/sessions',  sessionsRouter)
 app.use('/api/dashboard', dashboardRouter)
 app.use('/api/admin',     adminRouter)
+app.use('/api/account',   accountRouter)
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }))

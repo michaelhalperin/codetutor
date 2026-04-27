@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
+import { deleteAccountRequest } from "../lib/api";
 import toast from "react-hot-toast";
 import {
   User,
@@ -37,6 +38,9 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -86,6 +90,30 @@ export default function Profile() {
       toast.error("Failed to sign out.");
       setSigningOut(false);
       setShowSignOutConfirm(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.trim() !== "DELETE") {
+      toast.error('Type "DELETE" to confirm.');
+      return;
+    }
+
+    setDeletingAccount(true);
+    try {
+      await deleteAccountRequest();
+      try {
+        await signOut();
+      } catch {
+        // User may already be invalidated by server-side account deletion.
+      }
+      toast.success("Account deleted.");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to delete account.");
+      setDeletingAccount(false);
+      setShowDeleteConfirm(false);
+      setDeleteConfirmText("");
     }
   };
 
@@ -143,12 +171,12 @@ export default function Profile() {
                     <AlertTriangle size={16} className="shrink-0 mt-0.5" />
                     Are you sure you want to sign out?
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={handleSignOut}
                       disabled={signingOut}
-                      className="bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold px-4 py-2 rounded-lg transition"
+                      className="bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-3 py-1.5 rounded-lg transition"
                     >
                       {signingOut ? "Signing out..." : "Yes, Sign Out"}
                     </button>
@@ -156,7 +184,7 @@ export default function Profile() {
                       type="button"
                       onClick={() => setShowSignOutConfirm(false)}
                       disabled={signingOut}
-                      className="bg-dark-900 border border-slate-600 hover:border-slate-500 text-slate-200 font-semibold px-4 py-2 rounded-lg transition"
+                      className="bg-dark-900 border border-slate-600 hover:border-slate-500 text-slate-200 font-semibold text-sm px-3 py-1.5 rounded-lg transition"
                     >
                       Cancel
                     </button>
@@ -229,6 +257,64 @@ export default function Profile() {
                 {saving ? "Saving..." : "Save Changes"}
               </button>
             </form>
+
+            <div className="mt-4 bg-dark-800 rounded-2xl border border-red-900/50 p-5">
+              <h3 className="text-white font-semibold mb-2">Danger Zone</h3>
+              <p className="text-sm text-slate-400 mb-4">
+                Permanently delete your account and all related data. This action cannot be undone.
+              </p>
+
+              {!showDeleteConfirm ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteConfirm(true);
+                    setDeleteConfirmText("");
+                  }}
+                  className="bg-red-700 hover:bg-red-800 text-white font-semibold text-sm px-3 py-1.5 rounded-lg transition"
+                >
+                  Delete Account
+                </button>
+              ) : (
+                <div className="border border-red-700/40 rounded-xl bg-red-900/15 p-4">
+                  <p className="text-sm text-red-200 mb-3">
+                    Are you absolutely sure? Your account will be permanently removed.
+                  </p>
+                  <label className="block text-xs text-red-200/90 mb-1.5">
+                    Type <span className="font-semibold">DELETE</span> to confirm
+                  </label>
+                  <input
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="DELETE"
+                    disabled={deletingAccount}
+                    className="w-full mb-3 bg-dark-900 border border-red-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-red-200/40 focus:outline-none focus:border-red-500 transition"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleDeleteAccount}
+                      disabled={deletingAccount || deleteConfirmText.trim() !== "DELETE"}
+                      className="bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-3 py-1.5 rounded-lg transition"
+                    >
+                      {deletingAccount ? "Deleting..." : "Yes, Delete"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowDeleteConfirm(false);
+                        setDeleteConfirmText("");
+                      }}
+                      disabled={deletingAccount}
+                      className="bg-dark-900 border border-slate-600 hover:border-slate-500 text-slate-200 font-semibold text-sm px-3 py-1.5 rounded-lg transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
           </div>
         </div>

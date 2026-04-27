@@ -33,8 +33,14 @@ export const completeSession = (sessionId, stats) =>
 export const getSessions = () =>
   api.get('/api/sessions')
 
+export const getSessionResume = (sessionId) =>
+  api.get(`/api/sessions/${sessionId}/resume`)
+
 export const deleteSession = (sessionId) =>
   api.delete(`/api/sessions/${sessionId}`)
+
+export const deleteAccountRequest = () =>
+  api.delete('/api/account')
 
 // ---- Dashboard ----
 export const getDashboard = () =>
@@ -43,5 +49,11 @@ export const getDashboard = () =>
 // ---- Admin ----
 export const getAdminAnalytics = () =>
   api.get('/api/admin/analytics')
+
+export const getQuestionBank = () =>
+  api.get('/api/admin/question-bank')
+
+export const updateQuestionBankItem = (id, payload) =>
+  api.patch(`/api/admin/question-bank/${id}`, payload)
 
 export default api
