@@ -1,5 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Users, Activity, Trophy, ClipboardList, Clock3 } from 'lucide-react'
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
+} from 'recharts'
 import Navbar from '../components/Navbar'
 import { getAdminAnalytics, getQuestionBank, updateQuestionBankItem } from '../lib/api'
 
@@ -30,6 +44,8 @@ function formatPercent(value) {
   return `${value}%`
 }
 
+const CHART_COLORS = ['#22d3ee', '#34d399', '#f59e0b', '#f43f5e', '#a78bfa', '#60a5fa']
+
 export default function Analytics() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -57,6 +73,50 @@ export default function Analytics() {
     const pct = analytics?.overview?.completionRate ?? 0
     return `${pct}% sessions completed`
   }, [analytics?.overview?.completionRate])
+
+  const completionFunnelData = useMemo(() => {
+    const funnel = analytics?.completionFunnel
+    return [
+      { name: 'Created', value: Number(funnel?.sessionsCreated) || 0 },
+      { name: 'Questions', value: Number(funnel?.withQuestions) || 0 },
+      { name: 'Completed', value: Number(funnel?.completed) || 0 }
+    ]
+  }, [analytics?.completionFunnel])
+
+  const cohortData = useMemo(() => {
+    const cohort = analytics?.cohort
+    return [
+      { day: 'D0', retention: 100 },
+      { day: 'D1', retention: Number(cohort?.d1) || 0 },
+      { day: 'D7', retention: Number(cohort?.d7) || 0 }
+    ]
+  }, [analytics?.cohort])
+
+  const performanceData = useMemo(() => {
+    const perf = analytics?.performance
+    return [
+      { name: 'API', latency: Number(perf?.avgLatencyMs) || 0 },
+      { name: 'Eval', latency: Number(perf?.avgEvalLatencyMs) || 0 }
+    ]
+  }, [analytics?.performance])
+
+  const topicScoreData = useMemo(
+    () =>
+      (analytics?.topTopics || []).slice(0, 6).map((topic) => ({
+        topic: topic.topic?.slice(0, 12) || 'N/A',
+        avgScore: Number(topic.avgScore) || 0
+      })),
+    [analytics?.topTopics]
+  )
+
+  const dropoffData = useMemo(
+    () =>
+      (analytics?.dropoffByQuestionIndex || []).slice(0, 12).map((row) => ({
+        question: `Q${row.index}`,
+        dropoffRate: Number(row.dropoffRate) || 0
+      })),
+    [analytics?.dropoffByQuestionIndex]
+  )
 
   const closeUserModal = () => setSelectedUser(null)
 
@@ -210,36 +270,89 @@ export default function Analytics() {
             <div className="grid lg:grid-cols-3 gap-4 mt-4">
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <h2 className="text-white font-semibold mb-3">Cohort Retention</h2>
-                <p className="text-slate-300 text-sm">Cohort size: {analytics?.cohort?.cohortSize ?? 0}</p>
-                <p className="text-slate-400 text-sm mt-1">D1: {analytics?.cohort?.d1 ?? 0}%</p>
-                <p className="text-slate-400 text-sm mt-1">D7: {analytics?.cohort?.d7 ?? 0}%</p>
+                <p className="text-slate-400 text-xs mb-2">Cohort size: {analytics?.cohort?.cohortSize ?? 0}</p>
+                <div className="h-44">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={cohortData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="day" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                      <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                      <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155' }} />
+                      <Line type="monotone" dataKey="retention" stroke="#60a5fa" strokeWidth={2} dot={{ r: 3 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
               </section>
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <h2 className="text-white font-semibold mb-3">Completion Funnel</h2>
-                <p className="text-slate-300 text-sm">Sessions created: {analytics?.completionFunnel?.sessionsCreated ?? 0}</p>
-                <p className="text-slate-400 text-sm mt-1">Questions generated: {analytics?.completionFunnel?.withQuestions ?? 0}</p>
-                <p className="text-slate-400 text-sm mt-1">Completed: {analytics?.completionFunnel?.completed ?? 0}</p>
+                <div className="h-44">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={completionFunnelData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={68} innerRadius={34}>
+                        {completionFunnelData.map((item, index) => (
+                          <Cell key={`${item.name}-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </section>
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <h2 className="text-white font-semibold mb-3">Performance</h2>
-                <p className="text-slate-300 text-sm">Avg latency: {analytics?.performance?.avgLatencyMs ?? 0}ms</p>
-                <p className="text-slate-400 text-sm mt-1">Failure rate: {analytics?.performance?.failureRate ?? 0}%</p>
-                <p className="text-slate-400 text-sm mt-1">Eval latency: {analytics?.performance?.avgEvalLatencyMs ?? 0}ms</p>
+                <p className="text-slate-400 text-xs mb-2">Failure rate: {analytics?.performance?.failureRate ?? 0}%</p>
+                <div className="h-44">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={performanceData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                      <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                      <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155' }} />
+                      <Bar dataKey="latency" fill="#a78bfa" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </section>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-4 mt-4">
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <h2 className="text-white font-semibold mb-3">Drop-off by Question Index</h2>
-                <div className="space-y-2 max-h-72 overflow-auto pr-1">
-                  {(analytics?.dropoffByQuestionIndex || []).map((row) => (
-                    <div key={row.index} className="bg-dark-900 rounded-lg border border-slate-700 px-3 py-2">
-                      <p className="text-slate-200 text-sm">Q{row.index}</p>
-                      <p className="text-slate-400 text-xs mt-1">{row.answered}/{row.shown} answered · {row.dropoffRate}% drop-off</p>
-                    </div>
-                  ))}
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dropoffData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="question" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                      <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                      <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155' }} />
+                      <Bar dataKey="dropoffRate" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
+                {dropoffData.length === 0 && (
+                  <p className="text-slate-500 text-sm mt-2">No drop-off data yet.</p>
+                )}
               </section>
+              <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
+                <h2 className="text-white font-semibold mb-3">Top Topic Scores</h2>
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={topicScoreData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="topic" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                      <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                      <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155' }} />
+                      <Bar dataKey="avgScore" fill="#34d399" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                {topicScoreData.length === 0 && (
+                  <p className="text-slate-500 text-sm mt-2">No topic score data yet.</p>
+                )}
+              </section>
+            </div>
+
+            <div className="grid lg:grid-cols-1 gap-4 mt-4">
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <h2 className="text-white font-semibold mb-3">Ambiguous Questions</h2>
                 <div className="space-y-2 max-h-72 overflow-auto pr-1">

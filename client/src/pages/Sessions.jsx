@@ -60,9 +60,13 @@ export default function Sessions() {
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-white">All Sessions</h1>
-            <p className="text-slate-400 mt-1">
-              {sessions.length} total · {completedCount} completed
-            </p>
+            {loading ? (
+              <div className="mt-2 h-5 w-44 bg-slate-700/50 rounded animate-pulse" />
+            ) : (
+              <p className="text-slate-400 mt-1">
+                {sessions.length} total · {completedCount} completed
+              </p>
+            )}
           </div>
           <button
             onClick={() => navigate('/dashboard')}
@@ -137,16 +141,6 @@ export default function Sessions() {
                         In progress
                       </span>
                     )}
-                    {isAdmin && (
-                      <button
-                        onClick={() => handleDelete(s.id)}
-                        disabled={deletingId === s.id}
-                        className="inline-flex items-center gap-1.5 text-xs text-rose-300 hover:text-rose-200 bg-rose-900/20 hover:bg-rose-900/30 border border-rose-700/40 px-2.5 py-1 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Trash2 size={14} />
-                        {deletingId === s.id ? 'Deleting...' : 'Delete'}
-                      </button>
-                    )}
                     {!s.completed && (
                       <button
                         onClick={() => navigate('/session', {
@@ -177,6 +171,16 @@ export default function Sessions() {
                       >
                         <Eye size={14} />
                         View Results
+                      </button>
+                    )}
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDelete(s.id)}
+                        disabled={deletingId === s.id}
+                        className="inline-flex items-center gap-1.5 text-xs text-rose-300 hover:text-rose-200 bg-rose-900/20 hover:bg-rose-900/30 border border-rose-700/40 px-2.5 py-1 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Trash2 size={14} />
+                        {deletingId === s.id ? 'Deleting...' : 'Delete'}
                       </button>
                     )}
                   </div>
