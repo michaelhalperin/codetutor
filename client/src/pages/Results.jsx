@@ -1,6 +1,9 @@
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import { CheckCircle, XCircle, RotateCcw, LayoutDashboard, Trophy, Lightbulb } from 'lucide-react'
+import { CheckCircle, XCircle, RotateCcw, LayoutDashboard, Trophy, Lightbulb, Loader2 } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { getSessionResults } from '../lib/api'
 
 function ScoreBadge({ score }) {
   if (score >= 80) return <span className="text-emerald-400 font-bold text-5xl">{score}%</span>
@@ -16,11 +19,70 @@ function getMessage(score) {
   return               "This topic needs more practice — you'll get there!"
 }
 
+function isGenericExpectedOnlyFeedback(feedback) {
+  return /^not correct\.\s*expected:/i.test(String(feedback || '').trim())
+}
+
 export default function Results() {
   const { state } = useLocation()
   const navigate = useNavigate()
 
-  const { topic, difficulty, results = [], questions = [] } = state || {}
+  const [topic, setTopic] = useState(state?.topic || '')
+  const [difficulty, setDifficulty] = useState(state?.difficulty || '')
+  const [questions, setQuestions] = useState(state?.questions || [])
+  const [results, setResults] = useState(state?.results || [])
+  const [loading, setLoading] = useState(false)
+  const sessionId = state?.sessionId
+
+  const needsHistoryFetch = useMemo(
+    () => Boolean(sessionId && (questions.length === 0 || results.length === 0)),
+    [sessionId, questions.length, results.length]
+  )
+
+  useEffect(() => {
+    if (!needsHistoryFetch) return
+
+    let mounted = true
+    setLoading(true)
+
+    getSessionResults(sessionId)
+      .then(({ data }) => {
+        if (!mounted) return
+        const fetchedSession = data?.session || {}
+        const fetchedQuestions = (data?.questions || []).map((q) => ({
+          id: q.id,
+          question: q.question_text,
+          type: q.question_type,
+          options: q.options,
+          correct_answer: q.correct_answer,
+          code_language: q.code_language,
+        }))
+        const fetchedResults = (data?.questions || []).map((q) => ({
+          questionId: q.id,
+          userAnswer: q.user_answer || '',
+          is_correct: Boolean(q.is_correct),
+          feedback: q.ai_feedback || '',
+          hint: null,
+        }))
+
+        setTopic((prev) => prev || fetchedSession.topic || '')
+        setDifficulty((prev) => prev || fetchedSession.difficulty || '')
+        setQuestions(fetchedQuestions)
+        setResults(fetchedResults)
+      })
+      .catch((error) => {
+        if (!mounted) return
+        toast.error(error?.response?.data?.error || 'Failed to load session results.')
+        navigate('/sessions')
+      })
+      .finally(() => {
+        if (mounted) setLoading(false)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [needsHistoryFetch, navigate, sessionId])
 
   const correct = results.filter((r) => r.is_correct).length
   const total   = questions.length
@@ -30,6 +92,19 @@ export default function Results() {
   // Only show feedback section if there's at least one wrong answer with feedback
   const wrongWithFeedback = results.filter((r) => !r.is_correct && r.feedback)
   const incorrect = Math.max(0, total - correct)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-dark-950">
+        <Navbar />
+        <div className="flex flex-col items-center justify-center h-[80vh] gap-4">
+          <Loader2 size={36} className="text-primary-500 animate-spin" />
+          <p className="text-slate-300 text-lg">Loading session results...</p>
+          <p className="text-slate-500 text-sm">Fetching your completed answers and feedback</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-dark-950">
@@ -148,14 +223,34 @@ export default function Results() {
                 {wrongWithFeedback.map((r, i) => {
                   const qIdx = results.findIndex((res) => res.questionId === r.questionId)
                   const q = questions[qIdx]
+                  const userAnswer = String(r?.userAnswer || '').trim()
+                  const correctAnswer = String(q?.correct_answer || '').trim()
+                  const feedbackText = String(r?.feedback || '').trim()
+                  const showFeedbackBody = feedbackText && !isGenericExpectedOnlyFeedback(feedbackText)
                   return (
                     <div key={i} className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                       <p className="text-rose-300 text-sm font-medium mb-2 line-clamp-2">
                         {q?.question}
                       </p>
-                      <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                        {r.feedback}
-                      </p>
+                      <div className="mb-3 grid gap-2 sm:grid-cols-2">
+                        <div className="rounded-lg border border-slate-700 bg-dark-900 px-3 py-2">
+                          <p className="text-xs text-slate-500 mb-1">Your answer</p>
+                          <p className="text-sm text-slate-300 whitespace-pre-wrap break-words">
+                            {userAnswer || 'No answer submitted.'}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-emerald-700/40 bg-emerald-900/10 px-3 py-2">
+                          <p className="text-xs text-emerald-300/80 mb-1">Correct answer</p>
+                          <p className="text-sm text-emerald-200 whitespace-pre-wrap break-words">
+                            {correctAnswer || 'Not available.'}
+                          </p>
+                        </div>
+                      </div>
+                      {showFeedbackBody && (
+                        <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                          {feedbackText}
+                        </p>
+                      )}
                       {r.hint && (
                         <div className="mt-3 bg-amber-900/20 rounded-lg px-3 py-2 border border-amber-700/30">
                           <p className="text-amber-300 text-xs">

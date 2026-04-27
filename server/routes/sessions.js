@@ -101,6 +101,34 @@ router.get('/:id/resume', async (req, res) => {
   res.json({ session, questions: questions || [] })
 })
 
+// GET /api/sessions/:id/results — fetch completed session with detailed question results
+router.get('/:id/results', async (req, res) => {
+  const { id } = req.params
+
+  let sessionQuery = supabase
+    .from('sessions')
+    .select('*')
+    .eq('id', id)
+
+  if (!req.auth?.isAdmin) {
+    sessionQuery = sessionQuery.eq('user_id', req.user.id)
+  }
+
+  const { data: session, error: sessionError } = await sessionQuery.single()
+
+  if (sessionError) return res.status(500).json({ error: sessionError.message })
+  if (!session) return res.status(404).json({ error: 'Session not found.' })
+
+  const { data: questions, error: questionsError } = await supabase
+    .from('questions')
+    .select('*')
+    .eq('session_id', id)
+    .order('created_at', { ascending: true })
+
+  if (questionsError) return res.status(500).json({ error: questionsError.message })
+  res.json({ session, questions: questions || [] })
+})
+
 // PATCH /api/sessions/:id/complete — mark session done and save score
 router.patch('/:id/complete', async (req, res) => {
   const { id } = req.params

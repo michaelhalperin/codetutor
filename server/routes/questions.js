@@ -55,6 +55,9 @@ router.post('/evaluate-session', async (req, res) => {
     const results = await batchEvaluateAnswers(answers, {
       feedbackFormat: experimentConfig.feedbackFormat,
     })
+    const answerByQuestionId = new Map(
+      answers.map((answer) => [answer.questionId, answer.userAnswer ?? ''])
+    )
 
     // Persist results back to the questions table
     await Promise.all(
@@ -62,6 +65,7 @@ router.post('/evaluate-session', async (req, res) => {
         supabase
           .from('questions')
           .update({
+            user_answer: answerByQuestionId.get(questionId) ?? '',
             is_correct,
             ai_feedback: feedback,
             answered_at: new Date().toISOString(),

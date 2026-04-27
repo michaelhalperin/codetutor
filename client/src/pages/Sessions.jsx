@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, PlayCircle, Trash2, XCircle } from 'lucide-react'
+import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, PlayCircle, Trash2, XCircle, Eye } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import toast from 'react-hot-toast'
 import { deleteSession, getSessions } from '../lib/api'
@@ -56,7 +56,7 @@ export default function Sessions() {
   return (
     <div className="min-h-screen bg-dark-950">
       <Navbar />
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8 h-[calc(100vh-64px)] flex flex-col">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-white">All Sessions</h1>
@@ -74,7 +74,7 @@ export default function Sessions() {
         </div>
 
         {loading ? (
-          <div className="space-y-3 animate-pulse">
+          <div className="space-y-3 animate-pulse overflow-y-auto pr-1 flex-1 min-h-0">
             {Array.from({ length: 5 }).map((_, idx) => (
               <div key={idx} className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <div className="flex items-center justify-between gap-2 mb-3">
@@ -107,12 +107,12 @@ export default function Sessions() {
             ))}
           </div>
         ) : sessions.length === 0 ? (
-          <div className="bg-dark-800 rounded-xl border border-slate-700 p-8 text-center">
+          <div className="bg-dark-800 rounded-xl border border-slate-700 p-8 text-center overflow-y-auto pr-1 flex-1 min-h-0">
             <p className="text-slate-300 font-medium">No sessions yet.</p>
             <p className="text-slate-500 text-sm mt-1">Start practicing to build your history.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-y-auto pr-1 flex-1 min-h-0">
             {sessions.map((s) => (
               <div key={s.id} className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
@@ -162,6 +162,21 @@ export default function Sessions() {
                       >
                         <PlayCircle size={14} />
                         Resume
+                      </button>
+                    )}
+                    {s.completed && (
+                      <button
+                        onClick={() => navigate('/results', {
+                          state: {
+                            sessionId: s.id,
+                            topic: s.topic,
+                            difficulty: s.difficulty,
+                          },
+                        })}
+                        className="inline-flex items-center gap-1.5 text-xs text-blue-200 hover:text-white bg-blue-700/20 hover:bg-blue-700/35 border border-blue-600/40 px-2.5 py-1 rounded-full transition"
+                      >
+                        <Eye size={14} />
+                        View Results
                       </button>
                     )}
                   </div>

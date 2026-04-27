@@ -36,6 +36,9 @@ export const getSessions = () =>
 export const getSessionResume = (sessionId) =>
   api.get(`/api/sessions/${sessionId}/resume`)
 
+export const getSessionResults = (sessionId) =>
+  api.get(`/api/sessions/${sessionId}/results`)
+
 export const deleteSession = (sessionId) =>
   api.delete(`/api/sessions/${sessionId}`)
 
