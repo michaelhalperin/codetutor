@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, PlayCircle, Trash2, XCircle, Eye } from 'lucide-react'
+import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, PlayCircle, Trash2, XCircle, Eye, SlidersHorizontal, ChevronDown, ChevronRight } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import toast from 'react-hot-toast'
 import { deleteSession, getSessions } from '../lib/api'
@@ -10,6 +10,10 @@ function ScoreBadge({ score }) {
   if (score >= 80) return <span className="text-emerald-400 font-semibold">{score}%</span>
   if (score >= 50) return <span className="text-amber-400 font-semibold">{score}%</span>
   return <span className="text-rose-400 font-semibold">{score}%</span>
+}
+
+function safeLower(value) {
+  return String(value || '').toLowerCase()
 }
 
 function formatDate(value) {
@@ -23,6 +27,15 @@ export default function Sessions() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState(null)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filters, setFilters] = useState({
+    userId: 'all',
+    topic: 'all',
+    difficulty: 'all',
+    status: 'all', // all | completed | in_progress
+    from: '',
+    to: '',
+  })
 
   useEffect(() => {
     getSessions()
@@ -33,6 +46,52 @@ export default function Sessions() {
       .catch(() => setSessions([]))
       .finally(() => setLoading(false))
   }, [])
+
+  const filterOptions = useMemo(() => {
+    const users = new Map()
+    const topics = new Set()
+    const difficulties = new Set()
+
+    for (const s of sessions) {
+      if (s.user_id) users.set(s.user_id, s.user_name || s.user_id)
+      if (s.topic) topics.add(s.topic)
+      if (s.difficulty) difficulties.add(s.difficulty)
+    }
+
+    return {
+      users: [...users.entries()]
+        .map(([id, label]) => ({ id, label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+      topics: [...topics].sort((a, b) => a.localeCompare(b)),
+      difficulties: [...difficulties].sort((a, b) => a.localeCompare(b)),
+    }
+  }, [sessions])
+
+  const filteredSessions = useMemo(() => {
+    // Non-admins shouldn't see filters (and they only receive their sessions anyway).
+    if (!isAdmin) return sessions
+
+    const fromTs = filters.from ? new Date(`${filters.from}T00:00:00`).getTime() : null
+    const toTs = filters.to ? new Date(`${filters.to}T23:59:59`).getTime() : null
+
+    return sessions.filter((s) => {
+      if (filters.userId !== 'all' && s.user_id !== filters.userId) return false
+      if (filters.topic !== 'all' && s.topic !== filters.topic) return false
+      if (filters.difficulty !== 'all' && s.difficulty !== filters.difficulty) return false
+      if (filters.status === 'completed' && !s.completed) return false
+      if (filters.status === 'in_progress' && s.completed) return false
+
+      if (fromTs || toTs) {
+        const dt = s.completed_at || s.started_at || null
+        const ts = dt ? new Date(dt).getTime() : null
+        if (!ts) return false
+        if (fromTs && ts < fromTs) return false
+        if (toTs && ts > toTs) return false
+      }
+
+      return true
+    })
+  }, [filters, isAdmin, sessions])
 
   const handleDelete = async (sessionId) => {
     if (!window.confirm('Delete this session permanently?')) return
@@ -49,8 +108,8 @@ export default function Sessions() {
   }
 
   const completedCount = useMemo(
-    () => sessions.filter((s) => s.completed).length,
-    [sessions]
+    () => filteredSessions.filter((s) => s.completed).length,
+    [filteredSessions]
   )
 
   return (
@@ -64,18 +123,108 @@ export default function Sessions() {
               <div className="mt-2 h-5 w-44 bg-slate-700/50 rounded animate-pulse" />
             ) : (
               <p className="text-slate-400 mt-1">
-                {sessions.length} total · {completedCount} completed
+                {filteredSessions.length} total · {completedCount} completed
               </p>
             )}
           </div>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2 bg-dark-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-sm font-medium px-4 py-2 rounded-xl transition"
-          >
-            <ArrowLeft size={16} />
-            Dashboard
-          </button>
+          <div className="flex items-center gap-2">
+            {isAdmin && !loading && (
+              <button
+                type="button"
+                onClick={() => setFiltersOpen((v) => !v)}
+                className="inline-flex items-center gap-2 text-slate-300 hover:text-white bg-dark-800/70 hover:bg-dark-800 border border-slate-700/80 px-3 py-1.5 rounded-lg text-sm transition"
+              >
+                <SlidersHorizontal size={15} />
+                Filters
+                {filtersOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+            )}
+          </div>
         </div>
+
+        {isAdmin && !loading && (
+          <div className="mb-3">
+            {filtersOpen && (
+              <div className="mt-2 bg-dark-800/80 rounded-xl border border-slate-700 p-3">
+                <div className="flex flex-col lg:flex-row gap-2">
+                  <select
+                    value={filters.userId}
+                    onChange={(e) => setFilters((f) => ({ ...f, userId: e.target.value }))}
+                    className="w-full lg:w-56 bg-dark-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/60"
+                  >
+                    <option value="all">All users</option>
+                    {filterOptions.users.map((u) => (
+                      <option key={u.id} value={u.id}>{u.label}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.topic}
+                    onChange={(e) => setFilters((f) => ({ ...f, topic: e.target.value }))}
+                    className="w-full lg:w-48 bg-dark-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/60"
+                  >
+                    <option value="all">All topics</option>
+                    {filterOptions.topics.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.difficulty}
+                    onChange={(e) => setFilters((f) => ({ ...f, difficulty: e.target.value }))}
+                    className="w-full lg:w-40 bg-dark-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 capitalize focus:outline-none focus:ring-2 focus:ring-primary-500/60"
+                  >
+                    <option value="all">All levels</option>
+                    {filterOptions.difficulties.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filters.status}
+                    onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
+                    className="w-full lg:w-40 bg-dark-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/60"
+                  >
+                    <option value="all">All status</option>
+                    <option value="completed">Completed</option>
+                    <option value="in_progress">In progress</option>
+                  </select>
+                </div>
+
+                <div className="mt-2 flex flex-col sm:flex-row gap-2 sm:items-end sm:justify-between">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
+                    <div>
+                      <p className="text-slate-500 text-xs mb-1">From</p>
+                      <input
+                        type="date"
+                        value={filters.from}
+                        onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
+                        className="w-full bg-dark-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/60"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-xs mb-1">To</p>
+                      <input
+                        type="date"
+                        value={filters.to}
+                        onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
+                        className="w-full bg-dark-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/60"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setFilters({ userId: 'all', topic: 'all', difficulty: 'all', status: 'all', from: '', to: '' })}
+                    className="text-xs font-medium text-slate-200 bg-dark-900 hover:bg-slate-800 border border-slate-700 px-2.5 py-1.5 rounded-lg transition w-full sm:w-auto"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {loading ? (
           <div className="space-y-3 animate-pulse overflow-y-auto pr-1 flex-1 min-h-0">
@@ -110,14 +259,16 @@ export default function Sessions() {
               </div>
             ))}
           </div>
-        ) : sessions.length === 0 ? (
+        ) : filteredSessions.length === 0 ? (
           <div className="bg-dark-800 rounded-xl border border-slate-700 p-8 text-center overflow-y-auto pr-1 flex-1 min-h-0">
-            <p className="text-slate-300 font-medium">No sessions yet.</p>
-            <p className="text-slate-500 text-sm mt-1">Start practicing to build your history.</p>
+            <p className="text-slate-300 font-medium">{sessions.length === 0 ? 'No sessions yet.' : 'No sessions match your filters.'}</p>
+            <p className="text-slate-500 text-sm mt-1">
+              {sessions.length === 0 ? 'Start practicing to build your history.' : 'Try clearing or adjusting the filters.'}
+            </p>
           </div>
         ) : (
           <div className="space-y-3 overflow-y-auto pr-1 flex-1 min-h-0">
-            {sessions.map((s) => (
+            {filteredSessions.map((s) => (
               <div key={s.id} className="bg-dark-800 rounded-xl border border-slate-700 p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                   <div>
@@ -202,9 +353,9 @@ export default function Sessions() {
                   <div className="col-span-2 bg-dark-900 rounded-lg border border-slate-700 px-3 py-2">
                     <p className="text-slate-500 text-xs mb-1 flex items-center gap-1.5">
                       <CalendarDays size={13} />
-                      Completed At
+                      {s.completed ? 'Completed At' : 'Started At'}
                     </p>
-                    <p className="text-slate-200">{formatDate(s.completed_at)}</p>
+                    <p className="text-slate-200">{formatDate(s.completed ? s.completed_at : s.started_at)}</p>
                   </div>
                 </div>
 

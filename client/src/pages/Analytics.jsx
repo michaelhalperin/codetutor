@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Users, Activity, Trophy, ClipboardList, Clock3 } from 'lucide-react'
+import { Users, Activity, Trophy, ClipboardList, Clock3, ChevronDown, ChevronRight } from 'lucide-react'
 import {
   Bar,
   BarChart,
@@ -54,6 +54,7 @@ export default function Analytics() {
   const [questionBank, setQuestionBank] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [draftQuestionText, setDraftQuestionText] = useState('')
+  const [questionBankOpen, setQuestionBankOpen] = useState(false)
 
   useEffect(() => {
     Promise.all([getAdminAnalytics(), getQuestionBank()])
@@ -180,9 +181,9 @@ export default function Analytics() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-4 mb-4">
-              <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
+              <section className="bg-dark-800 rounded-xl border border-slate-700 p-4 flex flex-col h-80">
                 <h2 className="text-white font-semibold mb-3">Top Users</h2>
-                <div className="space-y-2 max-h-80 overflow-auto pr-1">
+                <div className="space-y-2 flex-1 overflow-y-auto pr-1">
                   {(analytics?.topUsers || []).map((user) => (
                     <button
                       type="button"
@@ -202,9 +203,9 @@ export default function Analytics() {
                 </div>
               </section>
 
-              <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
+              <section className="bg-dark-800 rounded-xl border border-slate-700 p-4 flex flex-col h-80">
                 <h2 className="text-white font-semibold mb-3">All Users</h2>
-                <div className="space-y-2 max-h-80 overflow-auto pr-1">
+                <div className="space-y-2 flex-1 overflow-y-auto pr-1">
                   {(analytics?.allUsers || []).map((user) => (
                     <button
                       type="button"
@@ -367,71 +368,83 @@ export default function Analytics() {
             </div>
 
             <section className="bg-dark-800 rounded-xl border border-slate-700 p-4 mt-4">
-              <h2 className="text-white font-semibold mb-3">Question Bank Operations</h2>
-              <div className="space-y-2 max-h-[30rem] overflow-auto pr-1">
-                {questionBank.map((item) => (
-                  <div key={item.id} className="bg-dark-900 rounded-lg border border-slate-700 p-3">
-                    <p className="text-xs text-slate-500 mb-1">{item.topic} · {item.difficulty} · {item.question_type} · {item.source}</p>
-                    {editingId === item.id ? (
-                      <textarea
-                        value={draftQuestionText}
-                        onChange={(e) => setDraftQuestionText(e.target.value)}
-                        rows={3}
-                        className="w-full bg-dark-950 border border-slate-700 rounded p-2 text-sm text-slate-200"
-                      />
-                    ) : (
-                      <p className="text-sm text-slate-100 whitespace-pre-wrap">{item.question_text}</p>
-                    )}
-                    <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setQuestionBankOpen((v) => !v)}
+                className="w-full flex items-center justify-between gap-3"
+              >
+                <h2 className="text-white font-semibold">Question Bank Operations</h2>
+                <span className="text-slate-400">
+                  {questionBankOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                </span>
+              </button>
+
+              {questionBankOpen ? (
+                <div className="space-y-2 max-h-[30rem] overflow-auto pr-1 mt-3">
+                  {questionBank.map((item) => (
+                    <div key={item.id} className="bg-dark-900 rounded-lg border border-slate-700 p-3">
+                      <p className="text-xs text-slate-500 mb-1">{item.topic} · {item.difficulty} · {item.question_type} · {item.source}</p>
                       {editingId === item.id ? (
+                        <textarea
+                          value={draftQuestionText}
+                          onChange={(e) => setDraftQuestionText(e.target.value)}
+                          rows={3}
+                          className="w-full bg-dark-950 border border-slate-700 rounded p-2 text-sm text-slate-200"
+                        />
+                      ) : (
+                        <p className="text-sm text-slate-100 whitespace-pre-wrap">{item.question_text}</p>
+                      )}
+                      <div className="mt-2 flex gap-2">
+                        {editingId === item.id ? (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await updateQuestionBankItem(item.id, { patch: { question_text: draftQuestionText } })
+                              setQuestionBank((prev) => prev.map((row) => (row.id === item.id ? { ...row, question_text: draftQuestionText } : row)))
+                              setEditingId(null)
+                              setDraftQuestionText('')
+                            }}
+                            className="px-2.5 py-1 text-xs rounded bg-primary-600 text-white"
+                          >
+                            Save
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingId(item.id)
+                              setDraftQuestionText(item.question_text || '')
+                            }}
+                            className="px-2.5 py-1 text-xs rounded border border-slate-600 text-slate-200"
+                          >
+                            Edit
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={async () => {
-                            await updateQuestionBankItem(item.id, { patch: { question_text: draftQuestionText } })
-                            setQuestionBank((prev) => prev.map((row) => (row.id === item.id ? { ...row, question_text: draftQuestionText } : row)))
-                            setEditingId(null)
-                            setDraftQuestionText('')
+                            await updateQuestionBankItem(item.id, { action: 'approve' })
+                            setQuestionBank((prev) => prev.map((row) => (row.id === item.id ? { ...row, source: 'approved' } : row)))
                           }}
-                          className="px-2.5 py-1 text-xs rounded bg-primary-600 text-white"
+                          className="px-2.5 py-1 text-xs rounded border border-emerald-700 text-emerald-300"
                         >
-                          Save
+                          Approve
                         </button>
-                      ) : (
                         <button
                           type="button"
-                          onClick={() => {
-                            setEditingId(item.id)
-                            setDraftQuestionText(item.question_text || '')
+                          onClick={async () => {
+                            await updateQuestionBankItem(item.id, { action: 'archive' })
+                            setQuestionBank((prev) => prev.map((row) => (row.id === item.id ? { ...row, source: 'archived' } : row)))
                           }}
-                          className="px-2.5 py-1 text-xs rounded border border-slate-600 text-slate-200"
+                          className="px-2.5 py-1 text-xs rounded border border-rose-700 text-rose-300"
                         >
-                          Edit
+                          Archive
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await updateQuestionBankItem(item.id, { action: 'approve' })
-                          setQuestionBank((prev) => prev.map((row) => (row.id === item.id ? { ...row, source: 'approved' } : row)))
-                        }}
-                        className="px-2.5 py-1 text-xs rounded border border-emerald-700 text-emerald-300"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await updateQuestionBankItem(item.id, { action: 'archive' })
-                          setQuestionBank((prev) => prev.map((row) => (row.id === item.id ? { ...row, source: 'archived' } : row)))
-                        }}
-                        className="px-2.5 py-1 text-xs rounded border border-rose-700 text-rose-300"
-                      >
-                        Archive
-                      </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : null}
             </section>
           </>
         )}

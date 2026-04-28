@@ -6,7 +6,8 @@ import { getMetricsSnapshot, recordRequest } from '../services/metrics.js'
 const router = Router()
 
 function getActivityDate(session) {
-  return session.completed_at || null
+  // Count a session as "activity" even if it wasn't completed.
+  return session.completed_at || session.started_at || null
 }
 
 router.get('/access', async (req, res) => {
@@ -26,7 +27,7 @@ router.get('/analytics', async (req, res) => {
         const [{ data: sessions, error: sessionsError }, { data: profiles, error: profilesError }, { data: authUsers, error: authUsersError }, { data: questions, error: questionsError }] = await Promise.all([
           supabase
             .from('sessions')
-            .select('id,user_id,topic,difficulty,completed,completed_at,score_percent,total_questions,correct_answers')
+            .select('id,user_id,topic,difficulty,completed,started_at,completed_at,score_percent,total_questions,correct_answers')
             .order('completed_at', { ascending: false, nullsFirst: false })
             .limit(5000),
           supabase
@@ -65,7 +66,12 @@ router.get('/analytics', async (req, res) => {
           ])
         )
         const userIdsFromSessions = new Set(sessionsList.map((s) => s.user_id).filter(Boolean))
-        const totalUsers = new Set([...profilesList.map((p) => p.id), ...userIdsFromSessions]).size
+        const allUserIds = new Set([
+          ...authUsersList.map((u) => u.id).filter(Boolean),
+          ...profilesList.map((p) => p.id).filter(Boolean),
+          ...userIdsFromSessions,
+        ])
+        const totalUsers = allUserIds.size
 
         const active7 = new Set()
         const active30 = new Set()
@@ -77,6 +83,25 @@ router.get('/analytics', async (req, res) => {
 
         const topicAgg = new Map()
         const userAgg = new Map()
+
+        // Ensure "All Users" truly means all known users (even with 0 sessions).
+        for (const uid of allUserIds) {
+          const authMeta = authUsersById.get(uid)
+          userAgg.set(uid, {
+            user_id: uid,
+            full_name: usersById.get(uid) || null,
+            sessions: 0,
+            completed: 0,
+            totalScore: 0,
+            scoredSessions: 0,
+            totalQuestions: 0,
+            totalCorrectAnswers: 0,
+            firstActivityAt: null,
+            lastActivityAt: null,
+            // Keep auth-only fields available later via authUsersById in mapping
+            _hasAuth: Boolean(authMeta),
+          })
+        }
 
         for (const session of sessionsList) {
           const activityDate = getActivityDate(session)
@@ -182,7 +207,7 @@ router.get('/analytics', async (req, res) => {
           }))
           .sort((a, b) => b.sessions - a.sessions)
 
-        const topUsers = allUsers.slice(0, 10)
+        const topUsers = allUsers.filter((u) => (u.sessions || 0) > 0).slice(0, 10)
 
         const recentSessions = sessionsList
           .slice(0, 12)
