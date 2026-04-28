@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import { Code2, LayoutDashboard, BookOpen, History, Menu, X, Settings, ShieldCheck } from 'lucide-react'
+import { Code2, LayoutDashboard, BookOpen, History, Menu, X, Settings, ShieldCheck, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 
@@ -50,6 +50,10 @@ export default function Navbar() {
             <Settings size={16} />
             Profile
           </NavLink>
+          <NavLink to="/utils" className={navLinkClass}>
+            <Wrench size={16} />
+            Utils
+          </NavLink>
           {isAdmin && (
             <NavLink to="/admin/analytics" className={navLinkClass}>
               <ShieldCheck size={16} />
@@ -81,6 +85,9 @@ export default function Navbar() {
           </NavLink>
           <NavLink to="/profile" onClick={() => setMenuOpen(false)} className={mobileNavLinkClass}>
             <Settings size={16} /> Profile
+          </NavLink>
+          <NavLink to="/utils" onClick={() => setMenuOpen(false)} className={mobileNavLinkClass}>
+            <Wrench size={16} /> Utils
           </NavLink>
           {isAdmin && (
             <NavLink to="/admin/analytics" onClick={() => setMenuOpen(false)} className={mobileNavLinkClass}>

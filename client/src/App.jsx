@@ -11,6 +11,8 @@ import Results from './pages/Results'
 import Sessions from './pages/Sessions'
 import Profile from './pages/Profile'
 import Analytics from './pages/Analytics'
+import Utils from './pages/Utils'
+import UtilsPreview from './pages/UtilsPreview'
 
 export default function App() {
   return (
@@ -38,6 +40,8 @@ export default function App() {
           <Route path="/results"   element={<ProtectedRoute><Results /></ProtectedRoute>} />
           <Route path="/sessions"  element={<ProtectedRoute><Sessions /></ProtectedRoute>} />
           <Route path="/profile"   element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/utils"     element={<ProtectedRoute><Utils /></ProtectedRoute>} />
+          <Route path="/utils/preview" element={<ProtectedRoute><UtilsPreview /></ProtectedRoute>} />
           <Route path="/admin/analytics" element={<ProtectedRoute requireAdmin><Analytics /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

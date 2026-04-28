@@ -59,4 +59,33 @@ export const getQuestionBank = () =>
 export const updateQuestionBankItem = (id, payload) =>
   api.patch(`/api/admin/question-bank/${id}`, payload)
 
+export const getUtilsFiles = () =>
+  api.get('/api/utils/files')
+
+export const uploadUtilsFile = (file) => {
+  const data = new FormData()
+  data.append('file', file)
+  return api.post('/api/utils/files', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
+export const getUtilsFileDownloadUrl = (fileName) => {
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+  const normalizedBase = apiBase.replace(/\/$/, '')
+  return `${normalizedBase}/api/utils/files/${encodeURIComponent(fileName)}/download`
+}
+
+export const downloadUtilsFile = async (fileName) => {
+  const url = `/api/utils/files/${encodeURIComponent(fileName)}/download`
+  const response = await api.get(url, { responseType: 'blob' })
+  return response.data
+}
+
+export const renameUtilsFile = (currentName, nextName) =>
+  api.patch(`/api/utils/files/${encodeURIComponent(currentName)}`, { name: nextName })
+
+export const deleteUtilsFile = (fileName) =>
+  api.delete(`/api/utils/files/${encodeURIComponent(fileName)}`)
+
 export default api
