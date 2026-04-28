@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import rateLimit from 'express-rate-limit'
 
 import questionsRouter from './routes/questions.js'
 import sessionsRouter from './routes/sessions.js'
@@ -41,22 +40,6 @@ app.use(cors({
   credentials: true,
 }))
 app.use(express.json())
-
-// General API rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  message: { error: 'Too many requests, please slow down.' },
-})
-app.use('/api', limiter)
-
-// Questions endpoint stricter limit
-const aiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 20,
-  message: { error: 'Too many AI requests, please wait a moment.' },
-})
-app.use('/api/questions', aiLimiter)
 
 // ---- Auth middleware on all /api routes ----
 app.use('/api', authenticate)
