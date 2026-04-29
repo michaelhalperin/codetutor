@@ -71,6 +71,19 @@ export function AuthProvider({ children }) {
       options: { data: { full_name: fullName } },
     })
     if (error) throw error
+
+    // If signUp did not return a session, try password sign-in
+    // so users can continue immediately when email confirmation is disabled.
+    if (!data?.session) {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) throw signInError
+      return signInData
+    }
+
     return data
   }
 

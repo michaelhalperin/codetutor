@@ -21,8 +21,8 @@ export default function Signup() {
     setLoading(true)
     try {
       await signUp(form.email, form.password, form.fullName)
-      toast.success('Account created! Check your email to confirm.')
-      navigate('/login')
+      toast.success('Account created! You are now signed in.')
+      navigate('/dashboard')
     } catch (err) {
       toast.error(err.message || 'Sign up failed.')
     } finally {
