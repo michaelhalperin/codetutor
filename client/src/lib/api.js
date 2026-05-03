@@ -88,4 +88,13 @@ export const renameUtilsFile = (currentName, nextName) =>
 export const deleteUtilsFile = (fileName) =>
   api.delete(`/api/utils/files/${encodeURIComponent(fileName)}`)
 
+export const createUtilsLink = (payload) =>
+  api.post('/api/utils/links', payload)
+
+export const renameUtilsLink = (linkId, payload) =>
+  api.patch(`/api/utils/links/${encodeURIComponent(linkId)}`, payload)
+
+export const deleteUtilsLink = (linkId) =>
+  api.delete(`/api/utils/links/${encodeURIComponent(linkId)}`)
+
 export default api
