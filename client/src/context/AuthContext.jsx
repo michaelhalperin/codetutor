@@ -1,7 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
+
+function userMustChangePassword(user) {
+  return Boolean(user?.user_metadata?.must_change_password)
+}
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export function AuthProvider({ children }) {
@@ -100,18 +104,50 @@ export function AuthProvider({ children }) {
 
   const updateProfile = async ({ fullName, password }) => {
     const payload = {}
-    if (typeof fullName === 'string') payload.data = { full_name: fullName.trim() }
-    if (typeof password === 'string' && password.trim()) payload.password = password.trim()
-
+    const dataPatch = {}
+    if (typeof fullName === 'string') dataPatch.full_name = fullName.trim()
+    if (typeof password === 'string' && password.trim()) {
+      payload.password = password.trim()
+      dataPatch.must_change_password = false
+    }
+    if (Object.keys(dataPatch).length) payload.data = dataPatch
     if (!Object.keys(payload).length) return null
 
     const { data, error } = await supabase.auth.updateUser(payload)
     if (error) throw error
+    if (data?.user) setUser(data.user)
     return data
   }
 
+  const completeMandatoryPasswordChange = async (newPassword) => {
+    const trimmed = typeof newPassword === 'string' ? newPassword.trim() : ''
+    if (!trimmed) throw new Error('Password is required.')
+    const { data, error } = await supabase.auth.updateUser({
+      password: trimmed,
+      data: { must_change_password: false },
+    })
+    if (error) throw error
+    if (data?.user) setUser(data.user)
+    return data
+  }
+
+  const mustChangePassword = useMemo(() => userMustChangePassword(user), [user])
+
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, adminLoading, signUp, signIn, signOut, updateProfile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAdmin,
+        adminLoading,
+        mustChangePassword,
+        signUp,
+        signIn,
+        signOut,
+        updateProfile,
+        completeMandatoryPasswordChange,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

@@ -17,8 +17,12 @@ export default function Login() {
     if (!email || !password) return toast.error("Please fill in all fields.");
     setLoading(true);
     try {
-      await signIn(email, password);
-      toast.success("Welcome back!");
+      const result = await signIn(email, password);
+      if (result?.user?.user_metadata?.must_change_password) {
+        toast.success("Signed in. Set a new password on the next screen.");
+      } else {
+        toast.success("Welcome back!");
+      }
       navigate("/dashboard");
     } catch (err) {
       toast.error(err.message || "Sign in failed. Check your credentials.");

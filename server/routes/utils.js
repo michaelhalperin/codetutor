@@ -12,8 +12,17 @@ const ALLOWED_EXTENSIONS = new Set(['.txt', '.pdf', '.docx', '.pptx', '.html'])
 
 await fs.mkdir(uploadDir, { recursive: true })
 
+/** Keep Unicode letters/numbers (e.g. Hebrew); strip controls and path/reserved chars. */
 function safeBaseName(fileName) {
-  return fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
+  const s = String(fileName)
+    .normalize('NFC')
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .replace(/[/\\:*?"<>|]/g, '_')
+    .replace(/[^\p{L}\p{M}\p{N}._\- ]/gu, '_')
+    .replace(/ +/g, ' ')
+    .trim()
+  if (!s || /^\.+$/.test(s)) return 'file'
+  return s
 }
 
 const storage = multer.diskStorage({

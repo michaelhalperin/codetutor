@@ -55,6 +55,7 @@ export default function Analytics() {
   const [editingId, setEditingId] = useState(null)
   const [draftQuestionText, setDraftQuestionText] = useState('')
   const [questionBankOpen, setQuestionBankOpen] = useState(false)
+  const [ambiguousQuestionsOpen, setAmbiguousQuestionsOpen] = useState(false)
 
   useEffect(() => {
     Promise.all([getAdminAnalytics(), getQuestionBank()])
@@ -355,15 +356,27 @@ export default function Analytics() {
 
             <div className="grid lg:grid-cols-1 gap-4 mt-4">
               <section className="bg-dark-800 rounded-xl border border-slate-700 p-4">
-                <h2 className="text-white font-semibold mb-3">Ambiguous Questions</h2>
-                <div className="space-y-2 max-h-72 overflow-auto pr-1">
-                  {(analytics?.questionAnalytics?.ambiguous || []).map((row, idx) => (
-                    <div key={`${row.question}-${idx}`} className="bg-dark-900 rounded-lg border border-slate-700 px-3 py-2">
-                      <p className="text-slate-200 text-xs line-clamp-2">{row.question}</p>
-                      <p className="text-slate-400 text-xs mt-1">{row.correctRate}% correct · {row.attempts} attempts</p>
-                    </div>
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setAmbiguousQuestionsOpen((v) => !v)}
+                  className="w-full flex items-center justify-between gap-3"
+                >
+                  <h2 className="text-white font-semibold">Ambiguous Questions</h2>
+                  <span className="text-slate-400 shrink-0">
+                    {ambiguousQuestionsOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                  </span>
+                </button>
+
+                {ambiguousQuestionsOpen ? (
+                  <div className="space-y-2 max-h-72 overflow-auto pr-1 mt-3">
+                    {(analytics?.questionAnalytics?.ambiguous || []).map((row, idx) => (
+                      <div key={`${row.question}-${idx}`} className="bg-dark-900 rounded-lg border border-slate-700 px-3 py-2">
+                        <p className="text-slate-200 text-xs line-clamp-2">{row.question}</p>
+                        <p className="text-slate-400 text-xs mt-1">{row.correctRate}% correct · {row.attempts} attempts</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </section>
             </div>
 

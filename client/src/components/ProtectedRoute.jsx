@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import MustChangePasswordModal from './MustChangePasswordModal'
 
 export default function ProtectedRoute({ children, requireAdmin = false }) {
   const { user, loading, isAdmin, adminLoading } = useAuth()
@@ -16,7 +17,19 @@ export default function ProtectedRoute({ children, requireAdmin = false }) {
   }
 
   if (!user) return <Navigate to="/login" replace />
-  if (requireAdmin && adminLoading) return children
+  if (requireAdmin && adminLoading) {
+    return (
+      <>
+        {children}
+        <MustChangePasswordModal />
+      </>
+    )
+  }
   if (requireAdmin && !isAdmin) return <Navigate to="/dashboard" replace />
-  return children
+  return (
+    <>
+      {children}
+      <MustChangePasswordModal />
+    </>
+  )
 }
