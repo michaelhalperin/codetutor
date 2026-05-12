@@ -3,28 +3,33 @@ import multer from 'multer'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { supabase } from '../services/db.js'
 
 const router = Router()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const uploadDir = path.join(__dirname, '..', 'uploads', 'utils')
-const linksFilePath = path.join(uploadDir, 'links.json')
 const ALLOWED_EXTENSIONS = new Set(['.txt', '.pdf', '.docx', '.pptx', '.html'])
 
 await fs.mkdir(uploadDir, { recursive: true })
 
-async function readLinks() {
-  try {
-    const raw = await fs.readFile(linksFilePath, 'utf8')
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
+function linkRowToItem(row) {
+  return {
+    kind: 'link',
+    id: row.id,
+    title: row.title,
+    url: row.url,
+    uploadedAt: row.uploaded_at,
   }
 }
 
-async function writeLinks(links) {
-  await fs.writeFile(linksFilePath, JSON.stringify(links, null, 2), 'utf8')
+async function listLinks() {
+  const { data, error } = await supabase
+    .from('utils_links')
+    .select('id, title, url, uploaded_at')
+    .order('uploaded_at', { ascending: false })
+  if (error) throw error
+  return data || []
 }
 
 function normalizeExternalUrl(input) {
@@ -83,7 +88,7 @@ router.get('/files', async (_req, res) => {
     const entries = await fs.readdir(uploadDir, { withFileTypes: true })
     const files = await Promise.all(
       entries
-        .filter((entry) => entry.isFile() && entry.name !== 'links.json')
+        .filter((entry) => entry.isFile())
         .map(async (entry) => {
           const fullPath = path.join(uploadDir, entry.name)
           const stat = await fs.stat(fullPath)
@@ -99,14 +104,8 @@ router.get('/files', async (_req, res) => {
           }
         })
     )
-    const links = await readLinks()
-    const linkItems = links.map((row) => ({
-      kind: 'link',
-      id: row.id,
-      title: row.title,
-      url: row.url,
-      uploadedAt: row.uploadedAt,
-    }))
+    const links = await listLinks()
+    const linkItems = links.map(linkRowToItem)
     const items = [...files, ...linkItems].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
     )
@@ -158,14 +157,17 @@ router.post('/links', async (req, res) => {
       title = href
     }
   }
-  const links = await readLinks()
   const id = `link-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
-  const row = { id, title, url: href, uploadedAt: new Date().toISOString() }
-  links.push(row)
-  await writeLinks(links)
-  return res.status(201).json({
-    item: { kind: 'link', id: row.id, title: row.title, url: row.url, uploadedAt: row.uploadedAt },
-  })
+  const uploadedAt = new Date().toISOString()
+  const { data: row, error } = await supabase
+    .from('utils_links')
+    .insert({ id, title, url: href, uploaded_at: uploadedAt })
+    .select('id, title, url, uploaded_at')
+    .single()
+  if (error) {
+    return res.status(500).json({ error: error.message || 'Failed to save link.' })
+  }
+  return res.status(201).json({ item: linkRowToItem(row) })
 })
 
 router.patch('/links/:id', async (req, res) => {
@@ -177,15 +179,17 @@ router.patch('/links/:id', async (req, res) => {
   if (!id || !nextTitle) {
     return res.status(400).json({ error: 'Link id and title are required.' })
   }
-  const links = await readLinks()
-  const index = links.findIndex((row) => row.id === id)
-  if (index === -1) return res.status(404).json({ error: 'Link not found.' })
-  links[index] = { ...links[index], title: nextTitle }
-  await writeLinks(links)
-  const row = links[index]
-  return res.json({
-    item: { kind: 'link', id: row.id, title: row.title, url: row.url, uploadedAt: row.uploadedAt },
-  })
+  const { data: rows, error } = await supabase
+    .from('utils_links')
+    .update({ title: nextTitle })
+    .eq('id', id)
+    .select('id, title, url, uploaded_at')
+  if (error) {
+    return res.status(500).json({ error: error.message || 'Failed to update link.' })
+  }
+  const row = rows?.[0]
+  if (!row) return res.status(404).json({ error: 'Link not found.' })
+  return res.json({ item: linkRowToItem(row) })
 })
 
 router.delete('/links/:id', async (req, res) => {
@@ -194,10 +198,11 @@ router.delete('/links/:id', async (req, res) => {
   }
   const id = String(req.params.id || '').trim()
   if (!id) return res.status(400).json({ error: 'Invalid link id.' })
-  const links = await readLinks()
-  const next = links.filter((row) => row.id !== id)
-  if (next.length === links.length) return res.status(404).json({ error: 'Link not found.' })
-  await writeLinks(next)
+  const { data: removed, error } = await supabase.from('utils_links').delete().eq('id', id).select('id')
+  if (error) {
+    return res.status(500).json({ error: error.message || 'Failed to delete link.' })
+  }
+  if (!removed?.length) return res.status(404).json({ error: 'Link not found.' })
   return res.status(204).send()
 })
 
@@ -211,10 +216,6 @@ router.patch('/files/:name', async (req, res) => {
   if (!currentName || !requestedName) {
     return res.status(400).json({ error: 'Current and new file names are required.' })
   }
-  if (currentName === 'links.json') {
-    return res.status(400).json({ error: 'Invalid file name.' })
-  }
-
   const currentExt = path.extname(currentName).toLowerCase()
   if (!ALLOWED_EXTENSIONS.has(currentExt)) {
     return res.status(400).json({ error: 'Invalid current file type.' })
@@ -234,9 +235,6 @@ router.patch('/files/:name', async (req, res) => {
 
   const safeBase = safeBaseName(path.basename(nextName, finalExt)).slice(0, 80) || 'file'
   const safeNextName = `${safeBase}${finalExt}`
-  if (safeNextName === 'links.json') {
-    return res.status(400).json({ error: 'This file name is reserved.' })
-  }
 
   const currentPath = path.join(uploadDir, currentName)
   const nextPath = path.join(uploadDir, safeNextName)
@@ -273,7 +271,6 @@ router.delete('/files/:name', async (req, res) => {
   }
   const safeName = path.basename(req.params.name || '')
   if (!safeName) return res.status(400).json({ error: 'Invalid file name.' })
-  if (safeName === 'links.json') return res.status(400).json({ error: 'Invalid file name.' })
   const fullPath = path.join(uploadDir, safeName)
   try {
     await fs.unlink(fullPath)
@@ -286,7 +283,6 @@ router.delete('/files/:name', async (req, res) => {
 router.get('/files/:name/download', async (req, res) => {
   const safeName = path.basename(req.params.name || '')
   if (!safeName) return res.status(400).json({ error: 'Invalid file name.' })
-  if (safeName === 'links.json') return res.status(404).json({ error: 'File not found.' })
   const fullPath = path.join(uploadDir, safeName)
   try {
     await fs.access(fullPath)

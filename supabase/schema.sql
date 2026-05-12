@@ -122,6 +122,20 @@ create table if not exists public.topic_stats (
 );
 
 -- ============================================================
+-- UTILS LINKS
+-- Shared resource links for the Utils page (admin-managed via API)
+-- ============================================================
+create table if not exists public.utils_links (
+  id          text primary key,
+  title       text not null,
+  url         text not null,
+  uploaded_at timestamptz not null default now()
+);
+
+alter table public.utils_links enable row level security;
+-- No policies: accessed only via Express with the service role key (bypasses RLS).
+
+-- ============================================================
 -- Row Level Security (RLS)
 -- Users can only see their own data
 -- ============================================================
